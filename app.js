@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const userRoutes = require('./routes/user.route');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 app.get('/', (req, res) => {
   res.send('Hello from Node');
@@ -11,8 +12,9 @@ app.get('/', (req, res) => {
 
 const port = process.env.PORT || 8008;
 
-app.use(express.json());
 app.use(morgan('dev'));
+app.use(express.json());
+app.use(cookieParser());
 
 // Middlewares
 app.use('/api/v1/users', userRoutes);
