@@ -11,6 +11,9 @@ const signup = async (req, res) => {
     // Sauvegarde de l'utilisateur dans la base de données
     const savedUser = await user.save();
 
+    user.salt = undefined;
+    user.hashed_password = undefined;
+
     // Réponse avec les données de l'utilisateur sauvegardé
     res.json({ user: savedUser });
   } catch (err) {
