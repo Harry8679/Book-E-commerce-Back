@@ -56,5 +56,9 @@ const signin = async (req, res) => {
   }
 };
 
+const signout = (req, res) => {
+  res.clearCookie('t');
+  res.json({ message: 'Signout success' });
+};
 
-module.exports = { signup, signin };
+module.exports = { signup, signin, signout };
