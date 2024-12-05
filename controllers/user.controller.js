@@ -1,5 +1,5 @@
-const test = (req, res) => {
-  res.send('Test');
+const signup = (req, res) => {
+  res.send('Sign up');
 };
 
-module.exports = { test };
+module.exports = { signup };
