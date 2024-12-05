@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const { errorHandler } = require('../helpers/dbErrorHandler.helper'); // Import du helper
 
 const signup = async (req, res) => {
   try {
@@ -13,8 +14,9 @@ const signup = async (req, res) => {
     // Réponse avec les données de l'utilisateur sauvegardé
     res.json({ user: savedUser });
   } catch (err) {
-    // Gestion des erreurs
-    res.status(400).json({ err: err.message });
+    // Gestion des erreurs avec le helper
+    const message = errorHandler(err); 
+    res.status(400).json({ error: message });
   }
 };
 
