@@ -5,7 +5,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/user.route');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const expressValidator = require('express-validator');
+// const expressValidator = require('express-validator');
 
 app.get('/', (req, res) => {
   res.send('Hello from Node');
@@ -16,7 +16,7 @@ const port = process.env.PORT || 8008;
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
-app.use(expressValidator());
+// app.use(expressValidator());
 
 // Middlewares
 app.use('/api/v1/users', userRoutes);
