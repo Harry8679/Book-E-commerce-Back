@@ -3,12 +3,16 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 const userRoutes = require('./routes/user.route');
+const morgan = require('morgan');
 
 app.get('/', (req, res) => {
   res.send('Hello from Node');
 });
 
 const port = process.env.PORT || 8008;
+
+app.use(express.json());
+app.use(morgan('dev'));
 
 // Middlewares
 app.use('/api/v1/users', userRoutes);
