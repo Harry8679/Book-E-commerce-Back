@@ -57,8 +57,14 @@ const signin = async (req, res) => {
 };
 
 const signout = (req, res) => {
-  res.clearCookie('t');
-  res.json({ message: 'Signout success' });
+  try {
+    res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    return res.status(200).json({ message: 'Signout success' });
+  } catch (err) {
+    console.error('Signout error:', err);
+    return res.status(500).json({ error: 'Something went wrong during signout' });
+  }
 };
+
 
 module.exports = { signup, signin, signout };
