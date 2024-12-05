@@ -1,5 +1,7 @@
 const User = require('../models/user.model');
 const { errorHandler } = require('../helpers/dbErrorHandler.helper'); // Import du helper
+const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
 
 const signup = async (req, res) => {
   try {
@@ -23,4 +25,36 @@ const signup = async (req, res) => {
   }
 };
 
-module.exports = { signup };
+const signin = async (req, res) => {
+  try {
+    const { email: userEmail, password } = req.body;
+
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(400).json({ error: 'User with that email does not exist. Please signup' });
+    }
+
+    // Vérification du mot de passe
+    const isAuthenticated = user.authenticate(password);
+    if (!isAuthenticated) {
+      console.log('Password mismatch:', {
+        storedHash: user.hashed_password,
+        inputHash: user.encryptPassword(password),
+      });
+      return res.status(401).json({ error: 'Email and password do not match' });
+    }
+
+    // Génération du token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    res.cookie('token', token, { expire: new Date() + 9999 });
+
+    const { _id, name, email } = user;
+    return res.json({ token, user: { _id, name, email } });
+  } catch (err) {
+    console.error('Signin error:', err);
+    return res.status(500).json({ error: 'Something went wrong during signin' });
+  }
+};
+
+
+module.exports = { signup, signin };
