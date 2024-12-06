@@ -65,6 +65,9 @@ const signout = (req, res) => {
     return res.status(500).json({ error: 'Something went wrong during signout' });
   }
 };
+const profile = (req, res) => {
+  
+};
 
 
 module.exports = { signup, signin, signout };
