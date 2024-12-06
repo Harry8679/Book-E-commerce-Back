@@ -13,7 +13,7 @@ router.get('/protected', requireSignin, (req, res) => {
 });
 
 // Route pour obtenir le profil de l'utilisateur
-router.get('/user/:userId', (req, res) => {
+router.get('/secret/:userId', (req, res) => {
   req.profile.salt = undefined; // Masquer le salt pour des raisons de sécurité
   req.profile.hashed_password = undefined; // Masquer le mot de passe hashé
   return res.json(req.profile);
