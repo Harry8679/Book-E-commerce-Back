@@ -66,8 +66,8 @@ const signout = (req, res) => {
   }
 };
 const profile = (req, res) => {
-  
+
 };
 
 
-module.exports = { signup, signin, signout };
+module.exports = { signup, signin, signout, profile };

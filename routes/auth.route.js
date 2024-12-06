@@ -1,5 +1,5 @@
 const express = require('express');
-const { signup, signin, signout } = require('../controllers/auth.controller');
+const { signup, signin, signout, profile } = require('../controllers/auth.controller');
 const { requireSignin, userById } = require('../middlewares/auth.middleware'); // Import du middleware
 const router = express.Router();
 
@@ -13,11 +13,7 @@ router.get('/protected', requireSignin, (req, res) => {
 });
 
 // Route pour obtenir le profil de l'utilisateur
-router.get('/secret/:userId', (req, res) => {
-  req.profile.salt = undefined; // Masquer le salt pour des raisons de sécurité
-  req.profile.hashed_password = undefined; // Masquer le mot de passe hashé
-  return res.json(req.profile);
-});
+router.get('/secret/:userId', profile);
 
 // Middleware paramétrique pour récupérer un utilisateur par ID
 router.param('userId', userById);
