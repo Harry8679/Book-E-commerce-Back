@@ -1,10 +1,15 @@
 const express = require('express');
 const { signup, signin, signout } = require('../controllers/user.controller');
-const { userSignupValidator } = require('../validator/index.validator');
+const { requireSignin } = require('../middlewares/auth.middleware'); // Import du middleware
 const router = express.Router();
 
-router.post('/signup', userSignupValidator, signup);
+router.post('/signup', signup);
 router.post('/signin', signin);
 router.get('/signout', signout);
+
+// Exemple de route protégée
+router.get('/protected', requireSignin, (req, res) => {
+  return res.json({ message: 'This route is protected' });
+});
 
 module.exports = router;
