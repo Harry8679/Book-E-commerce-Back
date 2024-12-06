@@ -1,5 +1,5 @@
 const express = require('express');
-const { signup, signin, signout } = require('../controllers/user.controller');
+const { signup, signin, signout } = require('../controllers/auth.controller');
 const { requireSignin } = require('../middlewares/auth.middleware'); // Import du middleware
 const router = express.Router();
 
