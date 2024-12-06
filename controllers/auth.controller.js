@@ -66,7 +66,9 @@ const signout = (req, res) => {
   }
 };
 const profile = (req, res) => {
-
+  req.profile.salt = undefined; // Masquer le salt pour des raisons de sécurité
+  req.profile.hashed_password = undefined; // Masquer le mot de passe hashé
+  return res.json(req.profile);
 };
 
 
