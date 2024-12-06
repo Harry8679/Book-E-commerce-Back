@@ -8,14 +8,31 @@ exports.requireSignin = expressjwt({
   requestProperty: 'auth', // Ajouter les informations du token à req.auth
 });
 
-exports.userById = (req, res, next, id) => {
-  User.findById(id).exec((err, user) => {
-    if (err || !user) {
+exports.userById = async (req, res, next, id) => {
+  try {
+    const user = await User.findById(id); // Utilisation de `await` au lieu de callback
+    if (!user) {
       return res.status(400).json({
         error: 'User not found',
       });
     }
-    req.profile = user;
+    req.profile = user; // Ajouter l'utilisateur trouvé à la requête
     next();
-  });
+  } catch (err) {
+    return res.status(500).json({
+      error: 'Error fetching user',
+    });
+  }
 };
+
+// exports.userById = (req, res, next, id) => {
+//   User.findById(id).exec((err, user) => {
+//     if (err || !user) {
+//       return res.status(400).json({
+//         error: 'User not found',
+//       });
+//     }
+//     req.profile = user;
+//     next();
+//   });
+// };
