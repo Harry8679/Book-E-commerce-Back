@@ -34,6 +34,20 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
+exports.isAuth = (req, res, next) => {
+  const userIdFromAuth = req.auth && req.auth._id; // ID extrait du token
+  const userIdFromProfile = req.profile && req.profile._id.toString(); // ID extrait du profil utilisateur
+
+  if (!userIdFromAuth || userIdFromAuth !== userIdFromProfile) {
+    return res.status(403).json({
+      error: 'Access denied. User is not authorized to access this resource.',
+    });
+  }
+
+  next();
+};
+
+
 
 // exports.userById = (req, res, next, id) => {
 //   User.findById(id).exec((err, user) => {
