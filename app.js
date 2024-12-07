@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 const authRoutes = require('./routes/auth.route');
+const categoryRoutes = require('./routes/category.route');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 // Middlewares
 app.use('/api/v1/users', authRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI, {})
