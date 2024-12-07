@@ -2,13 +2,13 @@ const Category = require("../models/category.model");
 
 const create = async (req, res) => {
   try {
-    // Création d'un nouvel utilisateur avec les données du corps de la requête
+    // Création d'une nouvelle catégorie avec les données du corps de la requête
     const category = new Category(req.body);
 
-    // Sauvegarde de l'utilisateur dans la base de données
+    // Sauvegarde de la catégorie dans la base de données
     const savedCategory = await category.save();
 
-    // Réponse avec les données de l'utilisateur sauvegardé
+    // Réponse avec les données de la catégorie sauvegardée
     res.json({ category: savedCategory });
   } catch (err) {
     // Gestion des erreurs avec le helper
