@@ -1,6 +1,8 @@
 const formidable = require('formidable');
 const _ = require('lodash');
 const Product = require('../models/product.model');
+const fs = require('fs');
+const { errorHandler } = require('../helpers/dbErrorHandler.helper');
 
 const create = (req, res) => {
   let form = new formidable.IncomingForm();
@@ -12,6 +14,20 @@ const create = (req, res) => {
       })
     }
     let product = new Product(fields);
+
+    if (files.photo) {
+      product.photo.data = fs.readFileSync(files.photo.path);
+      product.photo.contentType = files.photo.type;
+    }
+
+    product.save((err, result) => {
+      if (err) {
+        return res.status(400).json({
+          error: errorHandler(err)
+        });
+      }
+      res.json(result);
+    });
   });
 }
 
