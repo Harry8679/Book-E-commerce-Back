@@ -3,6 +3,6 @@ const { requireSignin, isAuth, isAdmin } = require('../middlewares/auth.middlewa
 const { create } = require('../controllers/product.controller');
 const router = express.Router();
 
-router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
+router.post('/create/:userId', requireSignin, isAdmin, create);
 
 module.exports = router;
