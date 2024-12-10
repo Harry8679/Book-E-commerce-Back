@@ -48,8 +48,8 @@ const signin = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
     res.cookie('token', token, { expire: new Date() + 9999 });
 
-    const { _id, name, email } = user;
-    return res.json({ token, user: { _id, name, email } });
+    const { _id, name, email, role } = user;
+    return res.json({ token, user: { _id, name, email, role } });
   } catch (err) {
     console.error('Signin error:', err);
     return res.status(500).json({ error: 'Something went wrong during signin' });
