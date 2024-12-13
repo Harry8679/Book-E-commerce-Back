@@ -5,11 +5,6 @@ const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
 router.get('/:productId', (req, res) => {
-  // Vérifie si le middleware productById a rempli req.product
-  if (!req.product) {
-    return res.status(400).json({ error: 'Product not found' });
-  }
-
   // Retourne les informations du produit
   req.product.photo = undefined; // Évite d'envoyer les données d'image trop volumineuses
   res.json(req.product);
