@@ -73,11 +73,18 @@ const create = async (req, res) => {
       return res.status(400).json({ error: errorHandler(saveErr) });
     }
   });
-  
 };
 
-const productById = async(req, res) => {
-  res.send('Product By ID');
+const productById = async(req, res, next, id) => {
+  Product.findById(id).exec((err, product) => {
+    if (err || !product) {
+      return res.status(400).json({
+        error: 'Product not found'
+      });
+    }
+    req.product = product;
+    next();
+  });
 }
 
 module.exports = { create, productById };
