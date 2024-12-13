@@ -12,7 +12,7 @@ const create = async (req, res) => {
   form.uploadDir = path.resolve(__dirname, '../uploads'); // Chemin absolu
 
   // Journaux des événements
-  form.on('fileBegin', (name, file) => {
+  /* form.on('fileBegin', (name, file) => {
     console.log('File upload started:', { name, file });
   });
 
@@ -22,7 +22,7 @@ const create = async (req, res) => {
 
   form.on('error', (err) => {
     console.error('Formidable error:', err);
-  });
+  });*/
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
