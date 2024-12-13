@@ -101,6 +101,19 @@ const productById = async (req, res, next, id) => {
 //   });
 // }
 
+const getProductById = (req, res) => {
+  try {
+    // Évite d'envoyer les données d'image volumineuses
+    req.product.photo = undefined;
+
+    // Retourne les informations du produit
+    res.json(req.product);
+  } catch (err) {
+    console.error('Error retrieving product:', err);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+}
+
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().select('-photo'); // Exclut la propriété photo
@@ -112,4 +125,4 @@ const getAllProducts = async (req, res) => {
 };
 
 
-module.exports = { create, productById, getAllProducts };
+module.exports = { create, productById, getAllProducts, getProductById };
