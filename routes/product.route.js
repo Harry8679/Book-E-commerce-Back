@@ -5,10 +5,18 @@ const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
 router.get('/:productId', (req, res) => {
-  // Retourne les informations du produit
-  req.product.photo = undefined; // Évite d'envoyer les données d'image trop volumineuses
-  res.json(req.product);
+  try {
+    // Évite d'envoyer les données d'image volumineuses
+    req.product.photo = undefined;
+
+    // Retourne les informations du produit
+    res.json(req.product);
+  } catch (err) {
+    console.error('Error retrieving product:', err);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
 });
+
 
 router.get('/', getAllProducts);
 
