@@ -55,6 +55,10 @@ const create = async (req, res) => {
   
     try {
       // Traitement de l'image
+      if (files.photo > 2000000) {
+        return res.status(404).json({ error: 'Image could not exceed 2 Mb' });
+      }
+
       const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
       if (photoFile && photoFile.filepath) {
         product.photo.data = fs.readFileSync(photoFile.filepath);
