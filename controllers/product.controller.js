@@ -87,9 +87,15 @@ const productById = async(req, res, next, id) => {
   });
 }
 
-const getAllProducts = async(req, res) => {
-  req.product.photo = undefined;
-  return res.json(req.product);
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find().select('-photo'); // Exclut la propriété photo
+    res.json(products);
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    res.status(400).json({ error: 'Could not retrieve products' });
+  }
 };
+
 
 module.exports = { create, productById, getAllProducts };
