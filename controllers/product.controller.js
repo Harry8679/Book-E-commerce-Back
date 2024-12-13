@@ -76,4 +76,8 @@ const create = async (req, res) => {
   
 };
 
-module.exports = { create };
+const productById = async(req, res) => {
+  res.send('Product By ID');
+}
+
+module.exports = { create, productById };
