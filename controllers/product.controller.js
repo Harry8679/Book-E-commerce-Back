@@ -75,17 +75,31 @@ const create = async (req, res) => {
   });
 };
 
-const productById = async(req, res, next, id) => {
-  Product.findById(id).exec((err, product) => {
-    if (err || !product) {
-      return res.status(400).json({
-        error: 'Product not found'
-      });
+const productById = async (req, res, next, id) => {
+  try {
+    const product = await Product.findById(id); // Utilise `await` au lieu de `exec` avec un callback
+    if (!product) {
+      return res.status(400).json({ error: 'Product not found' });
     }
     req.product = product;
     next();
-  });
-}
+  } catch (err) {
+    console.error('Error finding product by ID:', err);
+    res.status(400).json({ error: 'An error occurred while retrieving the product' });
+  }
+};
+
+// const productById = async(req, res, next, id) => {
+//   Product.findById(id).exec((err, product) => {
+//     if (err || !product) {
+//       return res.status(400).json({
+//         error: 'Product not found'
+//       });
+//     }
+//     req.product = product;
+//     next();
+//   });
+// }
 
 const getAllProducts = async (req, res) => {
   try {
