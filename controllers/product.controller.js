@@ -29,47 +29,47 @@ const create = async (req, res) => {
       console.error('Error parsing the form:', err);
       return res.status(400).json({ error: 'Image could not be uploaded' });
     }
-
+  
     console.log('Fields:', fields);
     console.log('Files:', files);
-
-    // Correction pour accéder au fichier photo
-    const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
-
-    if (!photoFile || !photoFile.filepath) {
-      console.error('Photo file is missing or filepath is undefined');
-      return res.status(400).json({
-        error: 'No photo uploaded or file path is missing',
-      });
+  
+    // Correction : Assurez-vous que chaque champ est converti en son type attendu
+    const sanitizedFields = {
+      name: fields.name?.toString(), // Convertit en chaîne
+      description: fields.description?.toString(),
+      price: Number(fields.price), // Convertit en nombre
+      category: fields.category?.toString(),
+      quantity: Number(fields.quantity),
+      shipping: fields.shipping === 'true', // Convertit en booléen
+    };
+  
+    console.log('Sanitized Fields:', sanitizedFields);
+  
+    // Validation si un champ critique est manquant
+    if (!sanitizedFields.name || !sanitizedFields.description || isNaN(sanitizedFields.price)) {
+      return res.status(400).json({ error: 'Some required fields are missing or invalid' });
     }
-
-    console.log('Attempting to read photo file at:', photoFile.filepath);
-
-    if (!fs.existsSync(photoFile.filepath)) {
-      console.error('File does not exist at path:', photoFile.filepath);
-      return res.status(400).json({
-        error: 'Uploaded file not found',
-      });
-    }
-
-    // Création du produit
-    let product = new Product(fields);
-
+  
+    // Création du produit avec les champs nettoyés
+    let product = new Product(sanitizedFields);
+  
     try {
-      // Lecture et affectation de l'image
-      product.photo.data = fs.readFileSync(photoFile.filepath);
-      product.photo.contentType = photoFile.mimetype;
-
+      // Traitement de l'image
+      const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
+      if (photoFile && photoFile.filepath) {
+        product.photo.data = fs.readFileSync(photoFile.filepath);
+        product.photo.contentType = photoFile.mimetype;
+      }
+  
       // Sauvegarde du produit
       const result = await product.save();
       res.json(result);
     } catch (saveErr) {
       console.error('Error saving the product:', saveErr);
-      return res.status(400).json({
-        error: errorHandler(saveErr),
-      });
+      return res.status(400).json({ error: errorHandler(saveErr) });
     }
   });
+  
 };
 
 module.exports = { create };
