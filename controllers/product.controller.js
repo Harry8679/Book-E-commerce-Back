@@ -87,4 +87,9 @@ const productById = async(req, res, next, id) => {
   });
 }
 
-module.exports = { create, productById };
+const getAllProducts = async(req, res) => {
+  req.product.photo = undefined;
+  return res.json(req.product);
+};
+
+module.exports = { create, productById, getAllProducts };
