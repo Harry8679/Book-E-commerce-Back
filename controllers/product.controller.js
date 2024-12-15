@@ -124,5 +124,11 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const deleteProduct = async (req, res) => {
+  res.status(200).json({
+    message: 'Delete Product'
+  });
+};
+
 
 module.exports = { create, productById, getAllProducts, getProductById };
