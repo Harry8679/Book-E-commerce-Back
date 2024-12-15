@@ -131,4 +131,4 @@ const deleteProduct = async (req, res) => {
 };
 
 
-module.exports = { create, productById, getAllProducts, getProductById };
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct };
