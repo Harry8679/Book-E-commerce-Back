@@ -125,10 +125,21 @@ const getAllProducts = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  res.status(200).json({
-    message: 'Delete Product'
-  });
+  try {
+    const product = req.product; // Récupère le produit injecté par le middleware productById
+
+    // Suppression du produit
+    const deletedProduct = await product.deleteOne();
+    res.json({
+      message: 'Product deleted successfully',
+      deletedProduct,
+    });
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    res.status(500).json({ error: 'An unexpected error occurred while deleting the product' });
+  }
 };
+
 
 
 module.exports = { create, productById, getAllProducts, getProductById, deleteProduct };
