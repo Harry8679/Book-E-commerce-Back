@@ -140,6 +140,10 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  res.status(200).send('Product updated successfully');
+};
 
 
-module.exports = { create, productById, getAllProducts, getProductById, deleteProduct };
+
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct };
