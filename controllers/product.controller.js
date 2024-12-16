@@ -4,6 +4,14 @@ const path = require('path');
 const Product = require('../models/product.model');
 const { errorHandler } = require('../helpers/dbErrorHandler.helper');
 
+// Fonction utilitaire pour nettoyer les champs
+const sanitizeField = (field) => {
+  if (Array.isArray(field)) {
+    return field[0]; // Prend la première valeur si c'est un tableau
+  }
+  return field; // Retourne la valeur telle quelle
+};
+
 const create = async (req, res) => {
   const form = new formidable.IncomingForm();
   form.keepExtensions = true;
@@ -11,61 +19,44 @@ const create = async (req, res) => {
   form.maxFileSize = 5 * 1024 * 1024; // Limite de taille : 5 MB
   form.uploadDir = path.resolve(__dirname, '../uploads'); // Chemin absolu
 
-  // Journaux des événements
-  /* form.on('fileBegin', (name, file) => {
-    console.log('File upload started:', { name, file });
-  });
-
-  form.on('file', (name, file) => {
-    console.log('File received:', { name, file });
-  });
-
-  form.on('error', (err) => {
-    console.error('Formidable error:', err);
-  });*/
-
   form.parse(req, async (err, fields, files) => {
     if (err) {
       console.error('Error parsing the form:', err);
       return res.status(400).json({ error: 'Image could not be uploaded' });
     }
-  
-    console.log('Fields:', fields);
-    console.log('Files:', files);
-  
-    // Correction : Assurez-vous que chaque champ est converti en son type attendu
+
+    // Nettoyage des champs
     const sanitizedFields = {
-      name: fields.name?.toString(), // Convertit en chaîne
-      description: fields.description?.toString(),
-      price: Number(fields.price), // Convertit en nombre
-      category: fields.category?.toString(),
-      quantity: Number(fields.quantity),
-      shipping: fields.shipping === 'true', // Convertit en booléen
+      name: sanitizeField(fields.name),
+      description: sanitizeField(fields.description),
+      price: Number(sanitizeField(fields.price)),
+      category: sanitizeField(fields.category),
+      quantity: Number(sanitizeField(fields.quantity)),
+      shipping: sanitizeField(fields.shipping) === 'true',
     };
-  
-    console.log('Sanitized Fields:', sanitizedFields);
-  
-    // Validation si un champ critique est manquant
+
     if (!sanitizedFields.name || !sanitizedFields.description || isNaN(sanitizedFields.price)) {
       return res.status(400).json({ error: 'Some required fields are missing or invalid' });
     }
-  
-    // Création du produit avec les champs nettoyés
+
+    // Création du produit
     let product = new Product(sanitizedFields);
-  
+
     try {
-      // Traitement de l'image
-      if (files.photo > 2000000) {
-        return res.status(404).json({ error: 'Image could not exceed 2 Mb' });
+      if (files.photo) {
+        const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
+        if (photoFile && photoFile.filepath) {
+          const stats = fs.statSync(photoFile.filepath);
+          if (stats.size > 2 * 1024 * 1024) {
+            return res.status(400).json({ error: 'Image should not exceed 2MB' });
+          }
+          product.photo = {
+            data: fs.readFileSync(photoFile.filepath),
+            contentType: photoFile.mimetype,
+          };
+        }
       }
 
-      const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
-      if (photoFile && photoFile.filepath) {
-        product.photo.data = fs.readFileSync(photoFile.filepath);
-        product.photo.contentType = photoFile.mimetype;
-      }
-  
-      // Sauvegarde du produit
       const result = await product.save();
       res.json(result);
     } catch (saveErr) {
@@ -77,7 +68,7 @@ const create = async (req, res) => {
 
 const productById = async (req, res, next, id) => {
   try {
-    const product = await Product.findById(id); // Utilise `await` au lieu de `exec` avec un callback
+    const product = await Product.findById(id);
     if (!product) {
       return res.status(400).json({ error: 'Product not found' });
     }
@@ -89,30 +80,15 @@ const productById = async (req, res, next, id) => {
   }
 };
 
-// const productById = async(req, res, next, id) => {
-//   Product.findById(id).exec((err, product) => {
-//     if (err || !product) {
-//       return res.status(400).json({
-//         error: 'Product not found'
-//       });
-//     }
-//     req.product = product;
-//     next();
-//   });
-// }
-
 const getProductById = (req, res) => {
   try {
-    // Évite d'envoyer les données d'image volumineuses
-    req.product.photo = undefined;
-
-    // Retourne les informations du produit
+    req.product.photo = undefined; // Retirer la photo des résultats
     res.json(req.product);
   } catch (err) {
     console.error('Error retrieving product:', err);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
-}
+};
 
 const getAllProducts = async (req, res) => {
   try {
@@ -126,9 +102,7 @@ const getAllProducts = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const product = req.product; // Récupère le produit injecté par le middleware productById
-
-    // Suppression du produit
+    const product = req.product;
     const deletedProduct = await product.deleteOne();
     res.json({
       message: 'Product deleted successfully',
@@ -141,9 +115,63 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  res.status(200).send('Product updated successfully');
+  const form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.multiples = false;
+  form.maxFileSize = 5 * 1024 * 1024; // Limite de taille : 5 MB
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Error parsing the form:', err);
+      return res.status(400).json({ error: 'Image could not be uploaded' });
+    }
+
+    try {
+      let product = req.product;
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      // Nettoyage des champs
+      const sanitizedFields = {
+        name: sanitizeField(fields.name),
+        description: sanitizeField(fields.description),
+        price: fields.price ? Number(sanitizeField(fields.price)) : product.price,
+        category: sanitizeField(fields.category),
+        quantity: fields.quantity ? Number(sanitizeField(fields.quantity)) : product.quantity,
+        shipping: fields.shipping !== undefined ? sanitizeField(fields.shipping) === 'true' : product.shipping,
+      };
+
+      // Mise à jour des champs
+      product.name = sanitizedFields.name || product.name;
+      product.description = sanitizedFields.description || product.description;
+      product.price = sanitizedFields.price;
+      product.category = sanitizedFields.category || product.category;
+      product.quantity = sanitizedFields.quantity;
+      product.shipping = sanitizedFields.shipping;
+
+      // Mise à jour de l'image
+      if (files.photo) {
+        const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo;
+        if (photoFile && photoFile.filepath) {
+          const stats = fs.statSync(photoFile.filepath);
+          if (stats.size > 2 * 1024 * 1024) {
+            return res.status(400).json({ error: 'Image should not exceed 2MB' });
+          }
+          product.photo = {
+            data: fs.readFileSync(photoFile.filepath),
+            contentType: photoFile.mimetype,
+          };
+        }
+      }
+
+      const updatedProduct = await product.save();
+      res.json(updatedProduct);
+    } catch (saveErr) {
+      console.error('Error updating the product:', saveErr);
+      res.status(500).json({ error: 'An unexpected error occurred while updating the product' });
+    }
+  });
 };
-
-
 
 module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct };
