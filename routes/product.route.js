@@ -7,6 +7,8 @@ router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
 router.get('/:productId', getProductById);
 // router.delete('/:productId/:userId', deleteProduct);
 router.delete('/:productId/:userId', requireSignin, isAuth, isAdmin, deleteProduct);
+router.put('/:productId/:userId', requireSignin, isAuth, isAdmin, updateProduct);
+
 
 
 
