@@ -63,13 +63,29 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   try {
     const category = req.category; // La catégorie est attachée par le middleware paramétrique
-    await category.deleteOne(); // Supprimer la catégorie
 
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    await category.deleteOne(); // Supprimer la catégorie
     res.json({ message: "Category deleted successfully" });
   } catch (err) {
+    console.error("Error deleting category:", err); // Pour débogage
     res.status(500).json({ error: "Error deleting the category" });
   }
 };
+
+// const deleteCategory = async (req, res) => {
+//   try {
+//     const category = req.category; // La catégorie est attachée par le middleware paramétrique
+//     await category.deleteOne(); // Supprimer la catégorie
+
+//     res.json({ message: "Category deleted successfully" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Error deleting the category" });
+//   }
+// };
 
 const categoryById = async (req, res, next, id) => {
   try {
