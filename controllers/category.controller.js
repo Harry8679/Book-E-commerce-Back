@@ -59,4 +59,16 @@ const updateCategory = async (req, res) => {
   }
 };
 
-module.exports = { create, listCategories, getCategoryById, updateCategory };
+// Supprimer une catégorie
+const deleteCategory = async (req, res) => {
+  try {
+    const category = req.category; // La catégorie est attachée par le middleware paramétrique
+    await category.deleteOne(); // Supprimer la catégorie
+
+    res.json({ message: "Category deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Error deleting the category" });
+  }
+};
+
+module.exports = { create, listCategories, getCategoryById, updateCategory, deleteCategory };
