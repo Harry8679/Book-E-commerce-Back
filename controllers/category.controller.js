@@ -27,4 +27,20 @@ const listCategories = async (req, res) => {
   }
 };
 
-module.exports = { create, listCategories };
+// Récupérer une catégorie par son ID
+const getCategoryById = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ error: "Error fetching the category" });
+  }
+};
+
+module.exports = { create, listCategories, getCategoryById };
