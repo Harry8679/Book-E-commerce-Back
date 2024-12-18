@@ -71,7 +71,7 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-const categoryById = () => async (req, res, next, id) => {
+const categoryById = async (req, res, next, id) => {
   try {
     const category = await Category.findById(id);
     if (!category) {
@@ -82,6 +82,19 @@ const categoryById = () => async (req, res, next, id) => {
   } catch (err) {
     return res.status(400).json({ error: 'Error fetching the category' });
   }
-}
+};
+
+// const categoryById = () => async (req, res, next, id) => {
+//   try {
+//     const category = await Category.findById(id);
+//     if (!category) {
+//       return res.status(404).json({ error: 'Category not found' });
+//     }
+//     req.category = category; // Attache la catégorie à la requête
+//     next();
+//   } catch (err) {
+//     return res.status(400).json({ error: 'Error fetching the category' });
+//   }
+// }
 
 module.exports = { create, listCategories, getCategoryById, updateCategory, deleteCategory, categoryById };
