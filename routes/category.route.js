@@ -1,5 +1,5 @@
 const express = require('express');
-const { create, listCategories, getCategoryById, updateCategory, deleteCategory } = require('../controllers/category.controller');
+const { create, listCategories, getCategoryById, updateCategory, deleteCategory, categoryById } = require('../controllers/category.controller');
 const { requireSignin, isAuth, isAdmin, userById } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
@@ -7,18 +7,7 @@ const router = express.Router();
 router.param('userId', userById);
 
 // Middleware paramétrique pour charger une catégorie
-router.param('categoryId', async (req, res, next, id) => {
-  try {
-    const category = await Category.findById(id);
-    if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
-    }
-    req.category = category; // Attache la catégorie à la requête
-    next();
-  } catch (err) {
-    return res.status(400).json({ error: 'Error fetching the category' });
-  }
-});
+router.param('categoryId', categoryById);
 
 // Routes
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
