@@ -17,4 +17,14 @@ const create = async (req, res) => {
   }
 };
 
-module.exports = { create };
+// Lister toutes les catégories
+const listCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ name: 1 }); // Trier par nom (ordre alphabétique)
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+};
+
+module.exports = { create, listCategories };
