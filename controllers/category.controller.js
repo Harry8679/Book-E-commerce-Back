@@ -43,4 +43,20 @@ const getCategoryById = async (req, res) => {
   }
 };
 
-module.exports = { create, listCategories, getCategoryById };
+// Modifier une catégorie
+const updateCategory = async (req, res) => {
+  try {
+    const category = req.category; // La catégorie est attachée par le middleware paramétrique
+
+    // Mise à jour des champs
+    category.name = req.body.name || category.name;
+
+    const updatedCategory = await category.save(); // Sauvegarde après modification
+    res.json(updatedCategory);
+  } catch (err) {
+    const message = errorHandler(err);
+    res.status(400).json({ error: message });
+  }
+};
+
+module.exports = { create, listCategories, getCategoryById, updateCategory };
