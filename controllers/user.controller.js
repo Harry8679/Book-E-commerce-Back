@@ -18,4 +18,10 @@ const userById = async (req, res, next, id) => {
   }
 };
 
-module.exports = { userById };
+const read = async (req, res) => {
+  req.profile.hashed_password = undefined;
+  req.profile.salt = undefined;
+  return res.json(req.profile);
+};
+
+module.exports = { userById, read };
