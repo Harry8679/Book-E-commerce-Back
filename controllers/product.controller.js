@@ -202,6 +202,10 @@ const list = async (req, res) => {
   }
 };
 
+/*
+ * It will find the products based on the req product category
+ * other that has the same category, will be returned
+*/
 const listRelated = async (req, res) => {
   res.send('List Related');
 };
