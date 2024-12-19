@@ -207,7 +207,32 @@ const list = async (req, res) => {
  * other that has the same category, will be returned
 */
 const listRelated = async (req, res) => {
-  res.send('List Related');
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6;
+
+    // Récupération du produit actuel pour sa catégorie
+    const product = await Product.findById(req.params.productId).select('category');
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Recherche des produits de la même catégorie
+    const products = await Product.find({ 
+        category: product.category, 
+        _id: { $ne: req.params.productId }, // Exclut le produit actuel
+      })
+      .select('-photo')
+      .populate('category', '_id name')
+      .limit(limit);
+
+    res.json(products);
+  } catch (err) {
+    console.error("Error fetching related products:", err);
+    res.status(400).json({
+      error: 'Related products not found',
+    });
+  }
 };
 
 
