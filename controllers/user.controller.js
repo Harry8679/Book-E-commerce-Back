@@ -36,11 +36,7 @@ const read = async (req, res) => {
 const update = async (req, res) => {
   try {
     // Recherche et mise à jour de l'utilisateur
-    const user = await User.findOneAndUpdate(
-      { _id: req.profile._id },
-      { $set: req.body },
-      { new: true }
-    );
+    const user = await User.findOneAndUpdate({ _id: req.profile._id },{ $set: req.body },{ new: true });
 
     // Si l'utilisateur n'est pas trouvé
     if (!user) {
