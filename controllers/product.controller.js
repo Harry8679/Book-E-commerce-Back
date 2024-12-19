@@ -250,7 +250,47 @@ const listCategories = async (req, res) => {
 };
 
 const listBySearch = async (req, res) => {
-  res.send('List By Search');
+  let order = req.body.order ? req.body.order : "desc";
+  let sortBy = req.body.sortBy ? req.body.sortBy : "_id";
+  let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+  let skip = parseInt(req.body.skip);
+  let findArgs = {};
+
+  for (let key in req.body.filters) {
+    if (req.body.filters[key].length > 0) {
+      if (key === "price") {
+        // gte - greater than price [0-10]
+        // lte - less than
+        findArgs[key] = {
+          $gte: req.body.filters[key][0],
+          $lte: req.body.filters[key][1],
+        };
+      } else {
+        findArgs[key] = req.body.filters[key];
+      }
+    }
+  }
+
+  try {
+    // Utilisation d'async/await au lieu de callback
+    const products = await Product.find(findArgs)
+      .select("-photo")
+      .populate("category")
+      .sort([[sortBy, order]])
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      size: products.length,
+      data: products,
+    });
+  } catch (err) {
+    console.error("Error fetching products by search:", err);
+    res.status(400).json({
+      error: "Products not found",
+    });
+  }
 };
+
 
 module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch };
