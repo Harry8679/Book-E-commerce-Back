@@ -40,4 +40,4 @@ const update = async (req, res) => {
 };
 
 
-module.exports = { userById, read };
+module.exports = { userById, read, update };
