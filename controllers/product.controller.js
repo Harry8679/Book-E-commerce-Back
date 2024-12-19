@@ -174,6 +174,13 @@ const updateProduct = async (req, res) => {
   });
 };
 
+/**
+ * 
+ * sell / arrival
+ * by sell = /products?sortBy=sold&order=desc&limit=4
+ * by arrival = /products?sortBy=createdAt&order=desc&limit=4
+ * if no params are sent, the all products are returned
+ */
 const list = async (req, res) => {
   let order = req.query.order ? req.query.order : 'asc';
   let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
