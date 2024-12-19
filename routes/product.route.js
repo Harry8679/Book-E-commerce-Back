@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireSignin, isAuth, isAdmin, userById } = require('../middlewares/auth.middleware');
-const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list } = require('../controllers/product.controller');
+const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated } = require('../controllers/product.controller');
 const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
@@ -10,7 +10,7 @@ router.delete('/:productId/:userId', requireSignin, isAuth, isAdmin, deleteProdu
 router.put('/:productId/:userId', requireSignin, isAuth, isAdmin, updateProduct);
 // router.get('/', getAllProducts);
 router.get('/', list);
-router.get('/related/:productId', list);
+router.get('/related/:productId', listRelated);
 
 // Middleware paramétrique pour userId
 router.param('userId', userById);
