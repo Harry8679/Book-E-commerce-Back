@@ -205,6 +205,7 @@ const list = async (req, res) => {
 /*
  * It will find the products based on the req product category
  * other that has the same category, will be returned
+ * Récupérer les produits de la même catégorie que le produit en cours.
 */
 const listRelated = async (req, res) => {
   try {
