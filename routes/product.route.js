@@ -10,6 +10,7 @@ router.delete('/:productId/:userId', requireSignin, isAuth, isAdmin, deleteProdu
 router.put('/:productId/:userId', requireSignin, isAuth, isAdmin, updateProduct);
 // router.get('/', getAllProducts);
 router.get('/', list);
+router.get('/related/:productId', list);
 
 // Middleware paramétrique pour userId
 router.param('userId', userById);

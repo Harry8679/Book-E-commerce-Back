@@ -202,5 +202,9 @@ const list = async (req, res) => {
   }
 };
 
+const listRelated = async (req, res) => {
+  res.send('List Related');
+};
 
-module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list };
+
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated };
