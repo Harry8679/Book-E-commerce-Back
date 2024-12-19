@@ -19,10 +19,19 @@ const userById = async (req, res, next, id) => {
 };
 
 const read = async (req, res) => {
-  req.profile.hashed_password = undefined;
-  req.profile.salt = undefined;
-  return res.json(req.profile);
+  try {
+    // Suppression des informations sensibles avant d'envoyer la réponse
+    req.profile.hashed_password = undefined;
+    req.profile.salt = undefined;
+
+    // Retourner le profil utilisateur
+    res.json(req.profile);
+  } catch (err) {
+    // Gestion des erreurs
+    res.status(500).json({ error: 'Error retrieving user profile' });
+  }
 };
+
 
 const update = async (req, res) => {
   User.findOneAndUpdate(
