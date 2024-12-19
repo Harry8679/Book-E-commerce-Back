@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireSignin, isAuth, isAdmin, userById } = require('../middlewares/auth.middleware');
-const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories } = require('../controllers/product.controller');
+const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch } = require('../controllers/product.controller');
 const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
@@ -12,6 +12,7 @@ router.put('/:productId/:userId', requireSignin, isAuth, isAdmin, updateProduct)
 // router.get('/', getAllProducts);
 router.get('/', list);
 router.get('/related/:productId', listRelated);
+router.post("/by/search", listBySearch);
 
 // Middleware paramétrique pour userId
 router.param('userId', userById);

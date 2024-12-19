@@ -249,4 +249,8 @@ const listCategories = async (req, res) => {
   }
 };
 
-module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories };
+const listBySearch = async (req, res) => {
+  res.send('List By Search');
+};
+
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch };
