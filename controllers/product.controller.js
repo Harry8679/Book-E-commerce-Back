@@ -236,8 +236,16 @@ const listRelated = async (req, res) => {
 };
 
 const listCategories = async (req, res) => {
-  res.send('List Categories');
+  try {
+    // Utilisation de Product.distinct pour récupérer les catégories distinctes
+    const categories = await Product.distinct('category');
+    res.json(categories);
+  } catch (err) {
+    // Gestion des erreurs
+    res.status(400).json({
+      error: 'Categories not found',
+    });
+  }
 };
-
 
 module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories };
