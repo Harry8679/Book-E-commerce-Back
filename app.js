@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth.route');
 const categoryRoutes = require('./routes/category.route');
 const productRoutes = require('./routes/product.route');
+const userRoutes = require('./routes/user.route');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 // Middlewares
 app.use('/api/v1/users', authRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
 
