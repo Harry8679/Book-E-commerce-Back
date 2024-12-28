@@ -1,11 +1,7 @@
-"use strict";
-     
-/**
- * Get unique error field name
- */
-const uniqueMessage = error => {
+const uniqueMessage = (error) => {
     let output;
     try {
+        // Extrait le nom du champ unique concerné
         let fieldName = error.message.substring(
             error.message.lastIndexOf(".$") + 2,
             error.message.lastIndexOf("_1")
@@ -13,35 +9,36 @@ const uniqueMessage = error => {
         output =
             fieldName.charAt(0).toUpperCase() +
             fieldName.slice(1) +
-            " already exists";
+            " already exists"; // Exemple : Email already exists
     } catch (ex) {
         output = "Unique field already exists";
     }
- 
+
     return output;
 };
- 
+
 /**
- * Get the erroror message from error object
+ * Get the error message from the error object
  */
-exports.errorHandler = error => {
+exports.errorHandler = (error) => {
     let message = "";
- 
+
     if (error.code) {
         switch (error.code) {
-            case 11000:
+            case 11000: // Gestion des doublons
             case 11001:
-                message = uniqueMessage(error);
+                message = uniqueMessage(error); // Appelle uniqueMessage()
                 break;
             default:
-                message = "Something went wrong";
+                message = "Something went wrong"; // Message générique
         }
     } else {
-        for (let errorName in error.errorors) {
-            if (error.errorors[errorName].message)
-                message = error.errorors[errorName].message;
+        for (let errorName in error.errors) {
+            if (error.errors[errorName].message) {
+                message = error.errors[errorName].message;
+            }
         }
     }
- 
+
     return message;
 };
