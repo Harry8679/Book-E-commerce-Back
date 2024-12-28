@@ -5,25 +5,38 @@ const expressJwt = require('express-jwt');
 
 const signup = async (req, res) => {
   try {
-    console.log('req.body', req.body);
+    const { email } = req.body; // Extraire l'email des données du corps de la requête
 
-    // Création d'un nouvel utilisateur avec les données du corps de la requête
+    // Vérifier si l'email existe déjà
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        error: "The email address is already in use. Please use a different one.",
+      });
+    }
+
+    // Si l'email n'existe pas, continuer avec l'inscription
     const user = new User(req.body);
 
-    // Sauvegarde de l'utilisateur dans la base de données
+    // Sauvegarder dans la base de données
     const savedUser = await user.save();
 
-    user.salt = undefined;
-    user.hashed_password = undefined;
+    // Supprimer les champs sensibles avant de retourner une réponse
+    savedUser.salt = undefined;
+    savedUser.hashed_password = undefined;
 
-    // Réponse avec les données de l'utilisateur sauvegardé
-    res.json({ user: savedUser });
+    res.status(201).json({ user: savedUser });
   } catch (err) {
-    // Gestion des erreurs avec le helper
-    const message = errorHandler(err); 
-    res.status(400).json({ error: message });
+    console.error("Signup error:", err);
+
+    // Gestion des erreurs générales
+    res.status(500).json({
+      error: "An error occurred during registration. Please try again.",
+    });
   }
 };
+
+
 
 const signin = async (req, res) => {
   try {
