@@ -90,31 +90,4 @@ const updatePassword = async (req, res) => {
   }
 };
 
-
-// const updatePassword = async (req, res) => {
-//   try {
-//     const user = req.profile; // Récupérer l'utilisateur attaché à la requête
-
-//     // Vérifier si un nouveau mot de passe est fourni
-//     const { newPassword } = req.body;
-//     if (!newPassword || newPassword.length < 6) {
-//       return res.status(400).json({
-//         error: 'Password must be at least 6 characters long',
-//       });
-//     }
-
-//     // Mettre à jour le mot de passe
-//     user.password = newPassword;
-//     await user.save(); // Sauvegarder les modifications
-
-//     res.json({
-//       message: 'Password updated successfully',
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       error: 'Failed to update password',
-//     });
-//   }
-// };
-
 module.exports = { userById, read, update, updatePassword };
