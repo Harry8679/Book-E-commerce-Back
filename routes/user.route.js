@@ -1,5 +1,5 @@
 const express = require('express');
-const { userById, read, update, updatePassword, getAllUsers } = require('../controllers/user.controller');
+const { userById, read, update, updatePassword, getAllUsers, adminUpdateUser } = require('../controllers/user.controller');
 const { requireSignin, isAuth, isAdmin } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -18,5 +18,8 @@ router.put('/profile/:userId/password', requireSignin, isAuth, updatePassword);
 
 // 🔐 Route pour récupérer tous les utilisateurs (protégée pour l'admin)
 router.get('/users/:userId', requireSignin, isAuth, isAdmin, getAllUsers);
+
+// 🔐 Route pour modifier un utilisateur (protégée pour l'admin)
+router.get('/users/:userId', requireSignin, isAuth, isAdmin, adminUpdateUser);
 
 module.exports = router;
