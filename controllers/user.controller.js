@@ -90,4 +90,17 @@ const updatePassword = async (req, res) => {
   }
 };
 
-module.exports = { userById, read, update, updatePassword };
+// Récupérer tous les utilisateurs (sans les mots de passe)
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select('-hashed_password -salt -__v'); // Exclure les champs sensibles
+
+    res.json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+
+module.exports = { userById, read, update, updatePassword, getAllUsers };
