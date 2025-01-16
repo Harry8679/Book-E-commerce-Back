@@ -35,19 +35,32 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-
 exports.isAuth = (req, res, next) => {
-  const userIdFromAuth = req.auth && req.auth._id; // ID extrait du token
-  const userIdFromProfile = req.profile && req.profile._id.toString(); // ID extrait du profil utilisateur
+  const isSameUser = req.profile && req.auth && req.profile._id.toString() === req.auth._id;
+  const isAdmin = req.auth && req.auth.role === 1;
 
-  if (!userIdFromAuth || userIdFromAuth !== userIdFromProfile) {
+  if (!isSameUser && !isAdmin) {
     return res.status(403).json({
-      error: 'Access denied. User is not authorized to access this resource.',
+      error: "Access denied. User is not authorized to access this resource."
     });
   }
 
   next();
 };
+
+
+// exports.isAuth = (req, res, next) => {
+//   const userIdFromAuth = req.auth && req.auth._id; // ID extrait du token
+//   const userIdFromProfile = req.profile && req.profile._id.toString(); // ID extrait du profil utilisateur
+
+//   if (!userIdFromAuth || userIdFromAuth !== userIdFromProfile) {
+//     return res.status(403).json({
+//       error: 'Access denied. User is not authorized to access this resource.',
+//     });
+//   }
+
+//   next();
+// };
 
 
 
