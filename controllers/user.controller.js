@@ -103,4 +103,32 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// 🔄 Mise à jour des informations d'un utilisateur par un administrateur (sauf le mot de passe)
+const adminUpdateUser = async (req, res) => {
+  try {
+    const userId = req.params.userId; // ID de l'utilisateur à modifier
+    const updates = req.body;
+
+    // Exclure le mot de passe des modifications
+    if (updates.password || updates.hashed_password || updates.salt) {
+      return res.status(400).json({ error: "Vous ne pouvez pas modifier le mot de passe ici." });
+    }
+
+    // Mise à jour de l'utilisateur (sauf mot de passe)
+    const updatedUser = await User.findByIdAndUpdate(userId, { $set: updates }, { new: true }).select('-hashed_password -salt -__v');
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.json({
+      message: "Utilisateur mis à jour avec succès",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error('Erreur lors de la mise à jour de l\'utilisateur :', err);
+    res.status(500).json({ error: "Erreur lors de la mise à jour de l'utilisateur" });
+  }
+};
+
 module.exports = { userById, read, update, updatePassword, getAllUsers };
