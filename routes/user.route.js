@@ -21,5 +21,6 @@ router.get('/users/:userId', requireSignin, isAuth, isAdmin, getAllUsers);
 
 // 🔐 Route pour modifier un utilisateur (protégée pour l'admin)
 router.put('/users/:userId/admin-update-user', requireSignin, isAuth, isAdmin, adminUpdateUser);
+// router.put('/users/:userId/admin-update-user', requireSignin, isAuth, isAdmin, adminUpdateUser);
 
 module.exports = router;
