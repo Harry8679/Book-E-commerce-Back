@@ -25,15 +25,28 @@ exports.userById = async (req, res, next, id) => {
   }
 };
 
+// exports.isAdmin = (req, res, next) => {
+//   if (!req.profile) {
+//     return res.status(400).json({ error: 'User profile is not available' });
+//   }
+//   if (req.profile.role !== 1) {
+//     return res.status(403).json({ error: 'Admin resource. Access denied.' });
+//   }
+//   next();
+// };
+
 exports.isAdmin = (req, res, next) => {
-  if (!req.profile) {
-    return res.status(400).json({ error: 'User profile is not available' });
+  if (!req.auth) {
+    return res.status(400).json({ error: 'Access denied. Authentication required.' });
   }
-  if (req.profile.role !== 1) {
+
+  if (req.auth.role !== 1) {
     return res.status(403).json({ error: 'Admin resource. Access denied.' });
   }
+
   next();
 };
+
 
 exports.isAuth = (req, res, next) => {
   const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté (via token)
