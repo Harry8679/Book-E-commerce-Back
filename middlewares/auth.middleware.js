@@ -35,6 +35,20 @@ exports.userById = async (req, res, next, id) => {
 //   next();
 // };
 
+exports.isAdmin = (req, res, next) => {
+  if (!req.auth) {
+    return res.status(400).json({ error: 'Access denied. Authentication required.' });
+  }
+
+  if (req.auth.role !== 1) {
+    return res.status(403).json({ error: 'Admin resource. Access denied.' });
+  }
+
+  next();
+};
+
+
+
 exports.isAuth = (req, res, next) => {
   const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
   const userRole = req.auth && req.auth.role;      // Rôle de l'utilisateur connecté
@@ -50,21 +64,6 @@ exports.isAuth = (req, res, next) => {
   });
 };
 
-
-exports.isAuth = (req, res, next) => {
-  const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté (via token)
-  const userIdFromProfile = req.profile && req.profile._id.toString(); // ID de la cible
-  const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
-
-  // Autoriser si : c'est le même utilisateur OU si c'est un admin
-  if (userIdFromAuth !== userIdFromProfile && userRole !== 1) {
-    return res.status(403).json({
-      error: 'Access denied. User is not authorized to access this resource.',
-    });
-  }
-
-  next();
-};
 
 
 // exports.isAuth = (req, res, next) => {
