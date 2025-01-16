@@ -36,12 +36,14 @@ exports.isAdmin = (req, res, next) => {
 };
 
 exports.isAuth = (req, res, next) => {
-  const isSameUser = req.profile && req.auth && req.profile._id.toString() === req.auth._id;
-  const isAdmin = req.auth && req.auth.role === 1;
+  const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté (via token)
+  const userIdFromProfile = req.profile && req.profile._id.toString(); // ID de la cible
+  const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
 
-  if (!isSameUser && !isAdmin) {
+  // Autoriser si : c'est le même utilisateur OU si c'est un admin
+  if (userIdFromAuth !== userIdFromProfile && userRole !== 1) {
     return res.status(403).json({
-      error: "Access denied. User is not authorized to access this resource."
+      error: 'Access denied. User is not authorized to access this resource.',
     });
   }
 
