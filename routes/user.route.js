@@ -20,6 +20,6 @@ router.put('/profile/:userId/password', requireSignin, isAuth, updatePassword);
 router.get('/users/:userId', requireSignin, isAuth, isAdmin, getAllUsers);
 
 // 🔐 Route pour modifier un utilisateur (protégée pour l'admin)
-router.get('/users/:userId', requireSignin, isAuth, isAdmin, adminUpdateUser);
+router.get('/users/:userId/admin-update-user', requireSignin, isAuth, isAdmin, adminUpdateUser);
 
 module.exports = router;
