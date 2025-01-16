@@ -36,6 +36,7 @@ exports.userById = async (req, res, next, id) => {
 // };
 
 exports.isAdmin = (req, res, next) => {
+  console.log('Admin req.auth', req.auth);
   if (!req.auth) {
     return res.status(400).json({ error: 'Access denied. Authentication required.' });
   }
@@ -53,6 +54,8 @@ exports.isAuth = (req, res, next) => {
   const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
   const userRole = req.auth && req.auth.role;      // Rôle de l'utilisateur connecté
   const userIdFromProfile = req.profile && req.profile._id.toString(); // ID de l'utilisateur ciblé
+
+  console.log('Auth req.auth', req.auth);
 
   // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
   if (userIdFromAuth === userIdFromProfile || userRole === 1) {

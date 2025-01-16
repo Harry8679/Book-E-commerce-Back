@@ -37,17 +37,17 @@ const signup = async (req, res) => {
 };
 
 
-
 const signin = async (req, res) => {
   try {
     const { email: userEmail, password } = req.body;
 
+    // 🔍 Vérifier si l'utilisateur existe
     const user = await User.findOne({ email: userEmail });
     if (!user) {
       return res.status(400).json({ error: 'User with that email does not exist. Please signup' });
     }
 
-    // Vérification du mot de passe
+    // 🔑 Vérification du mot de passe
     const isAuthenticated = user.authenticate(password);
     if (!isAuthenticated) {
       console.log('Password mismatch:', {
@@ -57,10 +57,17 @@ const signin = async (req, res) => {
       return res.status(401).json({ error: 'Email and password do not match' });
     }
 
-    // Génération du token
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    // ✅ Génération du token avec `_id` et `role`
+    const token = jwt.sign(
+      { _id: user._id, role: user.role }, // 👉 Ajout du rôle ici
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' } // 🔒 Expiration du token (facultatif)
+    );
+
+    // 🍪 Optionnel : Stocker le token dans un cookie
     res.cookie('token', token, { expire: new Date() + 9999 });
 
+    // ✅ Retourner les infos de l'utilisateur (sans données sensibles)
     const { _id, name, email, role } = user;
     return res.json({ token, user: { _id, name, email, role } });
   } catch (err) {
@@ -68,6 +75,37 @@ const signin = async (req, res) => {
     return res.status(500).json({ error: 'Something went wrong during signin' });
   }
 };
+
+// const signin = async (req, res) => {
+//   try {
+//     const { email: userEmail, password } = req.body;
+
+//     const user = await User.findOne({ email: userEmail });
+//     if (!user) {
+//       return res.status(400).json({ error: 'User with that email does not exist. Please signup' });
+//     }
+
+//     // Vérification du mot de passe
+//     const isAuthenticated = user.authenticate(password);
+//     if (!isAuthenticated) {
+//       console.log('Password mismatch:', {
+//         storedHash: user.hashed_password,
+//         inputHash: user.encryptPassword(password),
+//       });
+//       return res.status(401).json({ error: 'Email and password do not match' });
+//     }
+
+//     // Génération du token
+//     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+//     res.cookie('token', token, { expire: new Date() + 9999 });
+
+//     const { _id, name, email, role } = user;
+//     return res.json({ token, user: { _id, name, email, role } });
+//   } catch (err) {
+//     console.error('Signin error:', err);
+//     return res.status(500).json({ error: 'Something went wrong during signin' });
+//   }
+// };
 
 const signout = (req, res) => {
   try {
