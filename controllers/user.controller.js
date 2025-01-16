@@ -131,4 +131,4 @@ const adminUpdateUser = async (req, res) => {
   }
 };
 
-module.exports = { userById, read, update, updatePassword, getAllUsers };
+module.exports = { userById, read, update, updatePassword, getAllUsers, adminUpdateUser };
