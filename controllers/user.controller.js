@@ -131,4 +131,21 @@ const adminUpdateUser = async (req, res) => {
   }
 };
 
-module.exports = { userById, read, update, updatePassword, getAllUsers, adminUpdateUser };
+const adminGetUserById = async (req, res) => {
+  try {
+    const userId = req.params.userId;  // Récupération de l'ID depuis les paramètres de l'URL
+
+    const user = await User.findById(userId).select('-hashed_password -salt -__v');  // Exclure les champs sensibles
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.json(user);  // Retourner les données de l'utilisateur
+  } catch (err) {
+    console.error('Erreur lors de la récupération de l\'utilisateur :', err);
+    res.status(500).json({ error: "Erreur lors de la récupération de l'utilisateur" });
+  }
+};
+
+module.exports = { userById, read, update, updatePassword, getAllUsers, adminUpdateUser, adminGetUserById };
