@@ -1,11 +1,14 @@
 const express = require('express');
-const { userById, read, update, updatePassword, getAllUsers, adminUpdateUser } = require('../controllers/user.controller');
+const { userById, read, update, updatePassword, getAllUsers, adminUpdateUser, adminGetUserById } = require('../controllers/user.controller');
 const { requireSignin, isAuth, isAdmin } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
 // Middleware paramétrique pour charger l'utilisateur par ID
 router.param('userId', userById);
+
+// 🔐 Route pour récupérer un utilisateur par ID (protégée pour l'admin)
+router.get('/user/:userId', requireSignin, isAuth, isAdmin, adminGetUserById);
 
 // Route pour lire le profil utilisateur
 router.get('/profile/:userId', requireSignin, isAuth, read);
