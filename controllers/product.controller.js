@@ -109,7 +109,20 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getPicture = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId).select('photo');
+    if (!product || !product.photo || !product.photo.data) {
+      return res.status(404).json({ error: 'Photo not found' });
+    }
 
+    res.set('Content-Type', product.photo.contentType);
+    return res.send(product.photo.data);
+  } catch (err) {
+    console.error('Error fetching photo:', err);
+    res.status(500).json({ error: 'Could not fetch photo' });
+  }
+}
 
 // const getAllProducts = async (req, res) => {
 //   try {
@@ -314,4 +327,4 @@ const listBySearch = async (req, res) => {
 };
 
 
-module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch };
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture };
