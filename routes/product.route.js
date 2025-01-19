@@ -5,12 +5,14 @@ const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
 router.get('/categories', listCategories);
+router.get('/all', getAllProducts);
 router.get('/:productId', getProductById);
 // router.delete('/:productId/:userId', deleteProduct);
 router.delete('/:productId/:userId', requireSignin, isAuth, isAdmin, deleteProduct);
 router.put('/:productId/:userId', requireSignin, isAuth, isAdmin, updateProduct);
 // router.get('/', getAllProducts);
 router.get('/', list);
+// router.get('/all-products', list);
 router.get('/related/:productId', listRelated);
 router.post("/by/search", listBySearch);
 
