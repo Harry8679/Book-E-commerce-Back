@@ -109,6 +109,8 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+
+
 // const getAllProducts = async (req, res) => {
 //   try {
 //     const products = await Product.find().select('-photo'); // Exclut la propriété photo
