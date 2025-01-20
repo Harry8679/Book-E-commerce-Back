@@ -131,34 +131,32 @@ const getProductById = (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const order = req.query.order ? req.query.order : 'asc'; // Tri par défaut : ascendant
-    const sortBy = req.query.sortBy ? req.query.sortBy : '_id'; // Tri par défaut : par `_id`
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6; // Limite par défaut : 6 produits
-    const search = req.query.search || ''; // Recherche par nom ou catégorie (par défaut vide)
+    const order = req.query.order ? req.query.order : 'asc'; // Tri par ordre ascendant par défaut
+    const sortBy = req.query.sortBy ? req.query.sortBy : '_id'; // Tri par `_id` par défaut
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6; // Limite des résultats
+    const search = req.query.search || ''; // Recherche par nom ou catégorie
 
-    // Construire une requête de recherche
+    // Construire la requête de recherche
     const query = search
       ? {
           $or: [
-            { name: { $regex: search, $options: 'i' } }, // Recherche par nom insensible à la casse
-            { 'category.name': { $regex: search, $options: 'i' } }, // Recherche par catégorie insensible à la casse
+            { name: { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur le nom
+            { 'category.name': { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur la catégorie
           ],
         }
       : {};
 
     const products = await Product.find(query)
-      .select('-photo') // Exclut les données brutes des photos
+      .select('-photo') // Exclut le champ `photo`
       .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
       .sort([[sortBy, order]]) // Trie les résultats
       .limit(limit); // Limite les résultats
 
-    // Construire les URLs pour accéder aux images
-    const productsWithImageUrls = products.map((product) => {
-      return {
-        ...product.toObject(),
-        imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`, // URL pour récupérer l'image
-      };
-    });
+    // Ajout des URLs des images pour chaque produit
+    const productsWithImageUrls = products.map((product) => ({
+      ...product.toObject(),
+      imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`,
+    }));
 
     res.json(productsWithImageUrls);
   } catch (err) {
