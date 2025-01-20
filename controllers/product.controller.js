@@ -82,7 +82,7 @@ const productById = async (req, res, next, id) => {
 
 const getProductById = (req, res) => {
   try {
-    req.product.photo = undefined; // Retirer la photo des résultats
+    // req.product.photo = undefined; // Retirer la photo des résultats
     res.json(req.product);
   } catch (err) {
     console.error('Error retrieving product:', err);
