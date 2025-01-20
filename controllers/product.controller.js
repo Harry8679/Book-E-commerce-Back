@@ -108,11 +108,49 @@ const getProductById = (req, res) => {
 //     res.status(400).json({ error: 'Could not retrieve products' });
 //   }
 // };
+// const getAllProducts = async (req, res) => {
+//   try {
+//     const products = await Product.find()
+//       .select('-photo') // Exclut les données brutes des photos
+//       .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
+
+//     // Construire les URLs pour accéder aux images
+//     const productsWithImageUrls = products.map((product) => {
+//       return {
+//         ...product.toObject(),
+//         imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`, // URL pour récupérer l'image
+//       };
+//     });
+
+//     res.json(productsWithImageUrls);
+//   } catch (err) {
+//     console.error('Error fetching products:', err);
+//     res.status(400).json({ error: 'Could not retrieve products' });
+//   }
+// };
+
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const order = req.query.order ? req.query.order : 'asc'; // Tri par défaut : ascendant
+    const sortBy = req.query.sortBy ? req.query.sortBy : '_id'; // Tri par défaut : par `_id`
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6; // Limite par défaut : 6 produits
+    const search = req.query.search || ''; // Recherche par nom ou catégorie (par défaut vide)
+
+    // Construire une requête de recherche
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: 'i' } }, // Recherche par nom insensible à la casse
+            { 'category.name': { $regex: search, $options: 'i' } }, // Recherche par catégorie insensible à la casse
+          ],
+        }
+      : {};
+
+    const products = await Product.find(query)
       .select('-photo') // Exclut les données brutes des photos
       .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
+      .sort([[sortBy, order]]) // Trie les résultats
+      .limit(limit); // Limite les résultats
 
     // Construire les URLs pour accéder aux images
     const productsWithImageUrls = products.map((product) => {
