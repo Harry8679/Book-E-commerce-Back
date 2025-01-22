@@ -90,45 +90,6 @@ const getProductById = (req, res) => {
   }
 };
 
-// const getAllProducts = async (req, res) => {
-//   try {
-//     const products = await Product.find().select('-photo'); // Exclut le champ `photo` pour la liste principale
-
-//     // Construire les URLs pour accéder aux images
-//     const productsWithImageUrls = products.map((product) => {
-//       return {
-//         ...product.toObject(),
-//         imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`, // URL pour récupérer l'image
-//       };
-//     });
-
-//     res.json(productsWithImageUrls);
-//   } catch (err) {
-//     console.error('Error fetching products:', err);
-//     res.status(400).json({ error: 'Could not retrieve products' });
-//   }
-// };
-// const getAllProducts = async (req, res) => {
-//   try {
-//     const products = await Product.find()
-//       .select('-photo') // Exclut les données brutes des photos
-//       .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
-
-//     // Construire les URLs pour accéder aux images
-//     const productsWithImageUrls = products.map((product) => {
-//       return {
-//         ...product.toObject(),
-//         imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`, // URL pour récupérer l'image
-//       };
-//     });
-
-//     res.json(productsWithImageUrls);
-//   } catch (err) {
-//     console.error('Error fetching products:', err);
-//     res.status(400).json({ error: 'Could not retrieve products' });
-//   }
-// };
-
 const getAllProducts = async (req, res) => {
   try {
     const order = req.query.order ? req.query.order : 'asc'; // Tri par ordre ascendant par défaut
