@@ -383,5 +383,40 @@ const listBySearch = async (req, res) => {
   }
 };
 
+const getAllProductsWithPagination = async (req, res) => {
+  try {
+    const order = req.query.order ? req.query.order : 'asc'; // Tri par ordre ascendant par défaut
+    const sortBy = req.query.sortBy ? req.query.sortBy : '_id'; // Tri par `_id` par défaut
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6; // Limite des résultats
+    const search = req.query.search || ''; // Recherche par nom ou catégorie
 
-module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture };
+    // Construire la requête de recherche
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur le nom
+            { 'category.name': { $regex: search, $options: 'i' } }, // Recherche insensible à la casse sur la catégorie
+          ],
+        }
+      : {};
+
+    const products = await Product.find(query)
+      .select('-photo') // Exclut le champ `photo`
+      .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
+      .sort([[sortBy, order]]) // Trie les résultats
+      .limit(limit); // Limite les résultats
+
+    // Ajout des URLs des images pour chaque produit
+    const productsWithImageUrls = products.map((product) => ({
+      ...product.toObject(),
+      imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`,
+    }));
+
+    res.json(productsWithImageUrls);
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    res.status(400).json({ error: 'Could not retrieve products' });
+  }
+};
+
+module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture, getAllProductsWithPagination };
