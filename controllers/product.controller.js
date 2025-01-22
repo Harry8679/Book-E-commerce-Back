@@ -385,9 +385,10 @@ const listBySearch = async (req, res) => {
 
 const getAllProductsWithPagination = async (req, res) => {
   try {
-    const order = req.query.order ? req.query.order : 'asc'; // Tri par ordre ascendant par défaut
+    const order = req.query.order ? req.query.order : 'asc'; // Ordre ascendant par défaut
     const sortBy = req.query.sortBy ? req.query.sortBy : '_id'; // Tri par `_id` par défaut
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6; // Limite des résultats
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Page actuelle
     const search = req.query.search || ''; // Recherche par nom ou catégorie
 
     // Construire la requête de recherche
@@ -400,11 +401,19 @@ const getAllProductsWithPagination = async (req, res) => {
         }
       : {};
 
+    // Compter le nombre total de documents correspondant à la requête
+    const totalProducts = await Product.countDocuments(query);
+
+    // Calculer le nombre total de pages
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    // Récupérer les produits pour la page demandée
     const products = await Product.find(query)
       .select('-photo') // Exclut le champ `photo`
       .populate('category', '_id name') // Récupère uniquement l'ID et le nom de la catégorie
       .sort([[sortBy, order]]) // Trie les résultats
-      .limit(limit); // Limite les résultats
+      .skip((page - 1) * limit) // Sauter les produits des pages précédentes
+      .limit(limit); // Limiter les résultats à la page actuelle
 
     // Ajout des URLs des images pour chaque produit
     const productsWithImageUrls = products.map((product) => ({
@@ -412,11 +421,17 @@ const getAllProductsWithPagination = async (req, res) => {
       imageUrl: `${req.protocol}://${req.get('host')}/api/v1/products/photo/${product._id}`,
     }));
 
-    res.json(productsWithImageUrls);
+    // Retourner les produits, le nombre total de pages et le nombre total de produits
+    res.json({
+      products: productsWithImageUrls,
+      totalPages,
+      totalProducts,
+    });
   } catch (err) {
     console.error('Error fetching products:', err);
     res.status(400).json({ error: 'Could not retrieve products' });
   }
 };
+
 
 module.exports = { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture, getAllProductsWithPagination };
