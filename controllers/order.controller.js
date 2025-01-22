@@ -1,4 +1,5 @@
-const Order = require('../models/order.model');
+const Order = require('../models/order.model'); // Assurez-vous d'importer votre modèle de commande
+const Product = require('../models/product.model');
 
 // Créer une commande
 exports.createOrder = async (req, res) => {
@@ -6,53 +7,53 @@ exports.createOrder = async (req, res) => {
     const { products, totalPrice, paymentMethod } = req.body;
 
     if (!products || products.length === 0) {
-      return res.status(400).json({ error: 'No products in the order' });
+      return res.status(400).json({ message: 'No products in the order' });
     }
 
     const order = new Order({
-      user: req.user._id, // Récupéré depuis le middleware d'authentification
+      user: req.user._id, // Assurez-vous que `req.user` est défini par le middleware `isAuthenticated`
       products,
       totalPrice,
       paymentMethod,
     });
 
     const savedOrder = await order.save();
-    res.status(201).json(savedOrder);
+    res.status(201).json({ message: 'Order created successfully', order: savedOrder });
   } catch (error) {
     console.error('Error creating order:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ message: 'Failed to create order' });
   }
 };
 
-// Mettre à jour l'état de la commande (paiement)
+// Mettre à jour le paiement d'une commande
 exports.updateOrderPayment = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    const order = await Order.findById(orderId);
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { isPaid: true, paidAt: Date.now() },
+      { new: true }
+    );
 
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
     }
 
-    order.isPaid = true;
-    order.paidAt = new Date();
-
-    const updatedOrder = await order.save();
-    res.status(200).json(updatedOrder);
+    res.status(200).json({ message: 'Order payment updated', order: updatedOrder });
   } catch (error) {
-    console.error('Error updating order payment:', error);
-    res.status(500).json({ error: 'Failed to update order payment' });
+    console.error('Error updating payment:', error);
+    res.status(500).json({ message: 'Failed to update payment' });
   }
 };
 
-// Obtenir toutes les commandes d'un utilisateur
+// Obtenir toutes les commandes de l'utilisateur
 exports.getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).populate('products.product', 'name price');
-    res.status(200).json(orders);
+    res.status(200).json({ orders });
   } catch (error) {
     console.error('Error fetching user orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 };
