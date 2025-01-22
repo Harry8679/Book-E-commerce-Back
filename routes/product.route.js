@@ -1,11 +1,12 @@
 const express = require('express');
 const { requireSignin, isAuth, isAdmin, userById } = require('../middlewares/auth.middleware');
-const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture } = require('../controllers/product.controller');
+const { create, productById, getAllProducts, getProductById, deleteProduct, updateProduct, list, listRelated, listCategories, listBySearch, getPicture, getAllProductsWithPagination } = require('../controllers/product.controller');
 const router = express.Router();
 
 router.post('/create/:userId', requireSignin, isAuth, isAdmin, create);
 router.get('/categories', listCategories);
 router.get('/all', getAllProducts);
+router.get('/all-paginator', getAllProductsWithPagination);
 router.get('/:productId', getProductById);
 // router.delete('/:productId/:userId', deleteProduct);
 router.delete('/:productId/:userId', requireSignin, isAuth, isAdmin, deleteProduct);
