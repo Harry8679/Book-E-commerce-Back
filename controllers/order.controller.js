@@ -30,29 +30,6 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-// exports.createOrder = async (req, res) => {
-//   try {
-//     const { products, totalPrice, paymentMethod } = req.body;
-
-//     if (!products || products.length === 0) {
-//       return res.status(400).json({ message: 'No products in the order' });
-//     }
-
-//     const order = new Order({
-//       user: req.user._id, // Assurez-vous que `req.user` est défini par le middleware `isAuthenticated`
-//       products,
-//       totalPrice,
-//       paymentMethod,
-//     });
-
-//     const savedOrder = await order.save();
-//     res.status(201).json({ message: 'Order created successfully', order: savedOrder });
-//   } catch (error) {
-//     console.error('Error creating order:', error);
-//     res.status(500).json({ message: 'Failed to create order' });
-//   }
-// };
-
 // Mettre à jour le paiement d'une commande
 exports.updateOrderPayment = async (req, res) => {
   try {
