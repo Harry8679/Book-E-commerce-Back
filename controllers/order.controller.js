@@ -4,6 +4,9 @@ const Product = require('../models/product.model');
 // Créer une commande
 exports.createOrder = async (req, res) => {
   try {
+    console.log('Req body:', req.body);
+    console.log('Req auth:', req.auth); // Vérifiez si l'utilisateur est authentifié et si `req.auth` contient l'ID utilisateur
+
     const { products, totalPrice, paymentMethod } = req.body;
 
     if (!products || products.length === 0) {
@@ -11,19 +14,44 @@ exports.createOrder = async (req, res) => {
     }
 
     const order = new Order({
-      user: req.user._id, // Assurez-vous que `req.user` est défini par le middleware `isAuthenticated`
+      user: req.auth._id, // Remplacez req.user par req.auth (défini dans requireSignin)
       products,
       totalPrice,
       paymentMethod,
     });
 
     const savedOrder = await order.save();
+    console.log('Order saved successfully:', savedOrder);
+
     res.status(201).json({ message: 'Order created successfully', order: savedOrder });
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error('Error creating order:', error); // Log d'erreur détaillé
     res.status(500).json({ message: 'Failed to create order' });
   }
 };
+
+// exports.createOrder = async (req, res) => {
+//   try {
+//     const { products, totalPrice, paymentMethod } = req.body;
+
+//     if (!products || products.length === 0) {
+//       return res.status(400).json({ message: 'No products in the order' });
+//     }
+
+//     const order = new Order({
+//       user: req.user._id, // Assurez-vous que `req.user` est défini par le middleware `isAuthenticated`
+//       products,
+//       totalPrice,
+//       paymentMethod,
+//     });
+
+//     const savedOrder = await order.save();
+//     res.status(201).json({ message: 'Order created successfully', order: savedOrder });
+//   } catch (error) {
+//     console.error('Error creating order:', error);
+//     res.status(500).json({ message: 'Failed to create order' });
+//   }
+// };
 
 // Mettre à jour le paiement d'une commande
 exports.updateOrderPayment = async (req, res) => {
