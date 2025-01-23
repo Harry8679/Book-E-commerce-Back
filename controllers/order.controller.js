@@ -1,5 +1,6 @@
 const Order = require('../models/order.model'); // Assurez-vous d'importer votre modèle de commande
 const Product = require('../models/product.model');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Créer une commande
 exports.createOrder = async (req, res) => {
