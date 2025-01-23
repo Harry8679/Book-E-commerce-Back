@@ -1,5 +1,5 @@
 const express = require('express');
-const { createOrder, updateOrderPayment, getUserOrders } = require('../controllers/order.controller');
+const { createOrder, updateOrderPayment, getUserOrders, paymentStripe } = require('../controllers/order.controller');
 const { requireSignin, isAuth, isAdmin, userById } = require('../middlewares/auth.middleware');
 const { orderById } = require('../middlewares/order.middleware'); // Middleware pour obtenir une commande par ID
 const router = express.Router();
@@ -13,6 +13,8 @@ router.put('/:orderId/pay/:userId', requireSignin, isAuth, updateOrderPayment);
 
 // Obtenir toutes les commandes d'un utilisateur (accessible uniquement aux utilisateurs authentifiés)
 router.get('/my-orders/:userId', requireSignin, isAuth, getUserOrders);
+
+router.post('/payments/stripe', requireSignin, isAuth, paymentStripe);
 
 // Middleware paramétrique pour `userId`
 router.param('userId', userById);
