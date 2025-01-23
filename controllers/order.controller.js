@@ -62,3 +62,19 @@ exports.getUserOrders = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch orders' });
   }
 };
+
+exports.paymentStripe = async (req, res) => {
+  const { amount } = req.body; // Montant en centimes (par exemple, 500 pour 5 €)
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'eur',
+    });
+    res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error('Erreur Stripe :', error);
+    res.status(500).json({ error: error.message });
+  }
+};
