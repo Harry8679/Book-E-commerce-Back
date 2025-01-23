@@ -1,4 +1,4 @@
-const Order = require('../models/order.model'); // Assurez-vous d'importer votre modèle de commande
+const Order = require('../models/order.model');
 const Product = require('../models/product.model');
 
 // Créer une commande
@@ -11,7 +11,7 @@ exports.createOrder = async (req, res) => {
     }
 
     const order = new Order({
-      user: req.user._id, // Assurez-vous que `req.user` est défini par le middleware `isAuthenticated`
+      user: req.profile._id, // Utilise `req.profile._id` défini par `userById`
       products,
       totalPrice,
       paymentMethod,
@@ -47,10 +47,10 @@ exports.updateOrderPayment = async (req, res) => {
   }
 };
 
-// Obtenir toutes les commandes de l'utilisateur
+// Obtenir toutes les commandes d'un utilisateur
 exports.getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate('products.product', 'name price');
+    const orders = await Order.find({ user: req.profile._id }).populate('products.product', 'name price');
     res.status(200).json({ orders });
   } catch (error) {
     console.error('Error fetching user orders:', error);
