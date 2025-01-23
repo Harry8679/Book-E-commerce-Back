@@ -6,7 +6,7 @@ exports.orderById = async (req, res, next, id) => {
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    req.order = order; // Ajoute la commande à la requête
+    req.order = order; // Ajoute la commande à `req.order`
     next();
   } catch (error) {
     console.error('Error fetching order:', error);
