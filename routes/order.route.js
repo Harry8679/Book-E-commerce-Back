@@ -1,5 +1,5 @@
 const express = require('express');
-const { createOrder, updateOrderPayment, getUserOrders, paymentStripe, getAllOrders } = require('../controllers/order.controller');
+const { createOrder, updateOrderPayment, getUserOrders, paymentStripe, getAllOrders, getOrderById } = require('../controllers/order.controller');
 const { requireSignin, isAuth, userById, isAdmin } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
@@ -17,6 +17,9 @@ router.get('/my-orders', requireSignin, isAuth, getUserOrders);
 
 // Route pour les paiements Stripe
 router.post('/payments/stripe', requireSignin, isAuth, paymentStripe);
+
+// Obtenir une commande par son ID
+router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
 
 // Middleware paramétrique pour `userId`
 router.param('userId', userById);
