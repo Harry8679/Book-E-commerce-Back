@@ -111,3 +111,18 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
+// Récupérer les commandes d'un utilisateur
+exports.getUserOrders = async (req, res) => {
+  try {
+    const userId = req.auth._id; // Récupérer l'ID de l'utilisateur connecté via le middleware requireSignin
+    const orders = await Order.find({ user: userId })
+      .populate('products.product', 'name price') // Populer les informations des produits
+      .sort({ createdAt: -1 }); // Trier les commandes par date (plus récentes en premier)
+
+    return res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
+  }
+};
+
