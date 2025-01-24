@@ -48,16 +48,18 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-
-
 exports.isAuth = (req, res, next) => {
   const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
-  const userRole = req.auth && req.auth.role;      // Rôle de l'utilisateur connecté
-  const userIdFromProfile = req.profile && req.profile._id.toString(); // ID de l'utilisateur ciblé
+  const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
+  const userIdFromProfile = req.profile && req.profile._id?.toString(); // ID de l'utilisateur ciblé
 
   console.log('Auth req.auth', req.auth);
 
   // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
+  if (req.originalUrl.includes('/orders/create')) {
+    return next(); // Autoriser toutes les créations de commandes
+  }
+
   if (userIdFromAuth === userIdFromProfile || userRole === 1) {
     return next();
   }
@@ -66,6 +68,23 @@ exports.isAuth = (req, res, next) => {
     error: 'Access denied. User is not authorized to access this resource.',
   });
 };
+
+// exports.isAuth = (req, res, next) => {
+//   const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
+//   const userRole = req.auth && req.auth.role;      // Rôle de l'utilisateur connecté
+//   const userIdFromProfile = req.profile && req.profile._id.toString(); // ID de l'utilisateur ciblé
+
+//   console.log('Auth req.auth', req.auth);
+
+//   // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
+//   if (userIdFromAuth === userIdFromProfile || userRole === 1) {
+//     return next();
+//   }
+
+//   return res.status(403).json({
+//     error: 'Access denied. User is not authorized to access this resource.',
+//   });
+// };
 
 
 
