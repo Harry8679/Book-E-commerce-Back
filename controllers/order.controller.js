@@ -91,3 +91,23 @@ exports.getAllOrders = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
   }
 };
+
+// Récupérer une commande par son ID
+exports.getOrderById = async (req, res) => {
+  try {
+    const { orderId } = req.params; // Récupérer l'ID de la commande depuis les paramètres
+    const order = await Order.findById(orderId)
+      .populate('user', 'name email') // Populer les informations de l'utilisateur
+      .populate('products.product', 'name price'); // Populer les informations des produits
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    return res.status(200).json({ order });
+  } catch (error) {
+    console.error('Error fetching order by ID:', error);
+    return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
+  }
+};
+
