@@ -61,23 +61,53 @@ exports.getUserOrders = async (req, res) => {
 // Créer un PaymentIntent Stripe
 exports.paymentStripe = async (req, res) => {
   try {
-    const { amount } = req.body; // Montant en centimes
+    const { amount, orderId } = req.body; // Inclure `orderId` dans la requête
     if (!amount || amount <= 0) {
       return res.status(400).json({ message: 'Invalid payment amount' });
     }
 
+    // Créez le PaymentIntent Stripe
     const paymentIntent = await stripe.paymentIntents.create({
       amount, // Montant en centimes
-      currency: 'eur', // Devise
-      payment_method_types: ['card'], // Méthodes de paiement autorisées
+      currency: 'eur',
+      payment_method_types: ['card'],
     });
 
-    return res.status(200).json({ clientSecret: paymentIntent.client_secret }); // Retourner le clientSecret
+    // Mettre à jour le statut de la commande
+    await Order.findByIdAndUpdate(orderId, {
+      isPaid: true,
+      paidAt: Date.now(),
+    });
+
+    return res.status(200).json({
+      clientSecret: paymentIntent.client_secret, // Clé Stripe pour le frontend
+      message: 'Payment succeeded and order updated',
+    });
   } catch (error) {
     console.error('Erreur Stripe :', error);
-    return res.status(500).json({ message: 'Failed to create Stripe PaymentIntent', error: error.message });
+    return res.status(500).json({ message: 'Failed to process payment', error: error.message });
   }
 };
+
+// exports.paymentStripe = async (req, res) => {
+//   try {
+//     const { amount } = req.body; // Montant en centimes
+//     if (!amount || amount <= 0) {
+//       return res.status(400).json({ message: 'Invalid payment amount' });
+//     }
+
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount, // Montant en centimes
+//       currency: 'eur', // Devise
+//       payment_method_types: ['card'], // Méthodes de paiement autorisées
+//     });
+
+//     return res.status(200).json({ clientSecret: paymentIntent.client_secret }); // Retourner le clientSecret
+//   } catch (error) {
+//     console.error('Erreur Stripe :', error);
+//     return res.status(500).json({ message: 'Failed to create Stripe PaymentIntent', error: error.message });
+//   }
+// };
 
 // Obtenir toutes les commandes (réservé aux admins)
 exports.getAllOrders = async (req, res) => {
