@@ -16,7 +16,7 @@ router.put('/:orderId/pay', requireSignin, isAuth, updateOrderPayment);
 router.get('/my-orders', requireSignin, isAuth, getUserOrders);
 
 // Route pour les paiements Stripe
-router.post('/payments/stripe', requireSignin, isAuth, paymentStripe);
+router.post('/payments/stripe', requireSignin, paymentStripe);
 
 // Obtenir une commande par son ID
 router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
