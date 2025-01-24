@@ -1,6 +1,6 @@
 const express = require('express');
 const { createOrder, updateOrderPayment, getUserOrders, paymentStripe, getAllOrders } = require('../controllers/order.controller');
-const { requireSignin, isAuth, userById } = require('../middlewares/auth.middleware');
+const { requireSignin, isAuth, userById, isAdmin } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
 // Créer une commande (accessible uniquement aux utilisateurs authentifiés)
