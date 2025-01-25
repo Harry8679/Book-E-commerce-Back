@@ -60,6 +60,12 @@ exports.isAuth = (req, res, next) => {
     return next(); // Autoriser toutes les créations de commandes
   }
 
+  if (!req.auth || (userIdFromAuth !== userIdFromProfile && req.auth.role !== 1)) {
+    return res.status(403).json({
+      error: 'Access denied. User is not authorized to access this resource.',
+    });
+  }
+
   if (userIdFromAuth === userIdFromProfile || userRole === 1) {
     return next();
   }
