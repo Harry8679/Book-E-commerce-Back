@@ -74,10 +74,19 @@ exports.paymentStripe = async (req, res) => {
     });
 
     // Mettre à jour le statut de la commande
-    await Order.findByIdAndUpdate(orderId, {
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, {
       isPaid: true,
       paidAt: Date.now(),
-    });
+      status: 'Paid',
+    }, { new: true });
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    // await Order.findByIdAndUpdate(orderId, {
+    //   isPaid: true,
+    //   paidAt: Date.now(),
+    // });
 
     return res.status(200).json({
       clientSecret: paymentIntent.client_secret, // Clé Stripe pour le frontend
