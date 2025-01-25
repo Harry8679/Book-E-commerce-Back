@@ -1,5 +1,5 @@
 const Order = require('../models/order.model');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Import Stripe avec votre clé secrète
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Créer une commande
 exports.createOrder = async (req, res) => {
@@ -11,7 +11,7 @@ exports.createOrder = async (req, res) => {
     }
 
     const order = new Order({
-      user: req.auth._id, // Utilisez `req.auth` pour récupérer l'ID utilisateur
+      user: req.auth._id,
       products,
       totalPrice,
       paymentMethod,
@@ -32,7 +32,7 @@ exports.updateOrderPayment = async (req, res) => {
 
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
-      { isPaid: true, paidAt: Date.now() },
+      { isPaid: true, paidAt: Date.now(), status: 'Paid' },
       { new: true }
     );
 
@@ -47,7 +47,7 @@ exports.updateOrderPayment = async (req, res) => {
   }
 };
 
-// Obtenir toutes les commandes de l'utilisateur
+// Obtenir les commandes d'un utilisateur connecté
 exports.getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.auth._id }).populate('products.product', 'name price');
@@ -61,35 +61,27 @@ exports.getUserOrders = async (req, res) => {
 // Créer un PaymentIntent Stripe
 exports.paymentStripe = async (req, res) => {
   try {
-    const { amount, orderId } = req.body; // Inclure `orderId` dans la requête
+    const { amount, orderId } = req.body;
+
     if (!amount || amount <= 0) {
       return res.status(400).json({ message: 'Invalid payment amount' });
     }
 
-    // Créez le PaymentIntent Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount, // Montant en centimes
+      amount,
       currency: 'eur',
       payment_method_types: ['card'],
     });
 
-    // Mettre à jour le statut de la commande
-    const updatedOrder = await Order.findByIdAndUpdate(orderId, {
+    // Mettre à jour le statut de la commande après le paiement
+    await Order.findByIdAndUpdate(orderId, {
       isPaid: true,
       paidAt: Date.now(),
       status: 'Paid',
-    }, { new: true });
-
-    if (!updatedOrder) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-    // await Order.findByIdAndUpdate(orderId, {
-    //   isPaid: true,
-    //   paidAt: Date.now(),
-    // });
+    });
 
     return res.status(200).json({
-      clientSecret: paymentIntent.client_secret, // Clé Stripe pour le frontend
+      clientSecret: paymentIntent.client_secret,
       message: 'Payment succeeded and order updated',
     });
   } catch (error) {
@@ -98,46 +90,13 @@ exports.paymentStripe = async (req, res) => {
   }
 };
 
-// exports.paymentStripe = async (req, res) => {
-//   try {
-//     const { amount } = req.body; // Montant en centimes
-//     if (!amount || amount <= 0) {
-//       return res.status(400).json({ message: 'Invalid payment amount' });
-//     }
-
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount, // Montant en centimes
-//       currency: 'eur', // Devise
-//       payment_method_types: ['card'], // Méthodes de paiement autorisées
-//     });
-
-//     return res.status(200).json({ clientSecret: paymentIntent.client_secret }); // Retourner le clientSecret
-//   } catch (error) {
-//     console.error('Erreur Stripe :', error);
-//     return res.status(500).json({ message: 'Failed to create Stripe PaymentIntent', error: error.message });
-//   }
-// };
-
-// Obtenir toutes les commandes (réservé aux admins)
-exports.getAllOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({})
-      .populate('user', 'name email') // Populer les informations de l'utilisateur
-      .populate('products.product', 'name price'); // Populer les informations des produits
-    return res.status(200).json({ orders });
-  } catch (error) {
-    console.error('Error fetching all orders:', error);
-    return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
-  }
-};
-
-// Récupérer une commande par son ID
+// Obtenir une commande par son ID
 exports.getOrderById = async (req, res) => {
   try {
-    const { orderId } = req.params; // Récupérer l'ID de la commande depuis les paramètres
+    const { orderId } = req.params;
     const order = await Order.findById(orderId)
-      .populate('user', 'name email') // Populer les informations de l'utilisateur
-      .populate('products.product', 'name price'); // Populer les informations des produits
+      .populate('user', 'name email')
+      .populate('products.product', 'name price');
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -149,19 +108,3 @@ exports.getOrderById = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
   }
 };
-
-// Récupérer les commandes d'un utilisateur
-exports.getUserOrders = async (req, res) => {
-  try {
-    const userId = req.auth._id; // Récupérer l'ID de l'utilisateur connecté via le middleware requireSignin
-    const orders = await Order.find({ user: userId })
-      .populate('products.product', 'name price') // Populer les informations des produits
-      .sort({ createdAt: -1 }); // Trier les commandes par date (plus récentes en premier)
-
-    return res.status(200).json({ orders });
-  } catch (error) {
-    console.error('Error fetching user orders:', error);
-    return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
-  }
-};
-
