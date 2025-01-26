@@ -22,7 +22,7 @@ router.post('/payments/stripe', requireSignin, paymentStripe);
 router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
 
 // Obtenir les commandes de l'utilisateur connecté
-router.get('/my-orders', requireSignin, isAuth, getUserOrders);
+// router.get('/my-orders', requireSignin, isAuth, getUserOrders);
 
 // Middleware paramétrique pour `userId`
 router.param('userId', userById);

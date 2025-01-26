@@ -60,6 +60,28 @@ exports.isAuth = (req, res, next) => {
     return next(); // Autoriser toutes les créations de commandes
   }
 
+  // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
+  if (req.originalUrl.includes('/orders') && req.method === 'PUT') {
+    // Permettre à l'utilisateur de modifier sa propre commande
+    if (req.params.orderId) {
+      return Order.findById(req.params.orderId)
+        .then((order) => {
+          if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+          }
+
+          if (order.user.toString() === userIdFromAuth || userRole === 1) {
+            return next();
+          }
+
+          return res.status(403).json({ error: 'Access denied. User is not authorized to modify this order.' });
+        })
+        .catch((err) => {
+          return res.status(500).json({ error: 'Error checking order ownership.' });
+        });
+    }
+  }
+
   if (!req.auth || (userIdFromAuth !== userIdFromProfile && req.auth.role !== 1)) {
     return res.status(403).json({
       error: 'Access denied. User is not authorized to access this resource.',

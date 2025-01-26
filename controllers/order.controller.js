@@ -108,3 +108,16 @@ exports.getOrderById = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
   }
 };
+
+// Obtenir toutes les commandes (réservé aux admins)
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate('user', 'name email') // Populer les informations de l'utilisateur
+      .populate('products.product', 'name price'); // Populer les informations des produits
+    return res.status(200).json({ orders });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
+  }
+};
