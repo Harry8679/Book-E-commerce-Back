@@ -22,9 +22,11 @@ router.get('/last-order', requireSignin, isAuth, getLastOrder);
 router.post('/payments/stripe', requireSignin, paymentStripe);
 
 // Route pour le paiement via Paypal
-router.post('/create-paypal-order', requireSignin, createPaypalOrder);
+// router.post('/create-paypal-order', requireSignin, createPaypalOrder);
+router.post('/create-paypal-order', createPaypalOrder);
 
-router.post('/capture-paypal-order', requireSignin, capturePaypalOrder);
+// router.post('/capture-paypal-order', requireSignin, capturePaypalOrder);
+router.post('/capture-paypal-order', capturePaypalOrder);
 
 
 // Obtenir une commande par son ID
