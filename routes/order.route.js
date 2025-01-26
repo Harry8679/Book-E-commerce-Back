@@ -1,5 +1,5 @@
 const express = require('express');
-const { createOrder, updateOrderPayment, getUserOrders, paymentStripe, getAllOrders, getOrderById } = require('../controllers/order.controller');
+const { createOrder, updateOrderPayment, getUserOrders, paymentStripe, getAllOrders, getOrderById, getLastOrder } = require('../controllers/order.controller');
 const { requireSignin, isAuth, userById, isAdmin } = require('../middlewares/auth.middleware');
 const router = express.Router();
 
@@ -14,6 +14,9 @@ router.put('/:orderId/pay', requireSignin, isAuth, updateOrderPayment);
 
 // Obtenir toutes les commandes d'un utilisateur
 router.get('/my-orders', requireSignin, isAuth, getUserOrders);
+
+// Route pour obtenir la dernière commande d'un utilisateur connecté
+router.get('/last-order', requireSignin, isAuth, getLastOrder);
 
 // Route pour les paiements Stripe
 router.post('/payments/stripe', requireSignin, paymentStripe);
