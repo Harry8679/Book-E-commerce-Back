@@ -165,3 +165,17 @@ exports.createPaypalOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.capturePaypalOrder = async (req, res) => {
+  const { orderId } = req.body;
+
+  try {
+    const request = new paypal.orders.OrdersCaptureRequest(orderId);
+    request.requestBody({});
+    const capture = await client.execute(request);
+    res.status(200).json(capture.result);
+  } catch (error) {
+    console.error("Erreur de capture :", error);
+    res.status(500).json({ error: error.message });
+  }
+};
