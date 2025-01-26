@@ -121,3 +121,21 @@ exports.getAllOrders = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
   }
 };
+
+// Récupérer la dernière commande d'un utilisateur connecté
+exports.getLastOrder = async (req, res) => {
+  try {
+    const lastOrder = await Order.findOne({ user: req.auth._id })
+      .sort({ createdAt: -1 }) // Trier par la date de création, la plus récente en premier
+      .populate('products.product', 'name price'); // Populer les informations des produits
+
+    if (!lastOrder) {
+      return res.status(404).json({ message: 'No orders found for this user' });
+    }
+
+    return res.status(200).json({ order: lastOrder });
+  } catch (error) {
+    console.error('Error fetching the last order:', error);
+    return res.status(500).json({ message: 'Failed to fetch the last order', error: error.message });
+  }
+};
