@@ -186,3 +186,18 @@ exports.capturePaypalOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.capturePayPalOrder = async (req, res) => {
+  const { orderId } = req.body;
+
+  try {
+    const request = new paypal.orders.OrdersCaptureRequest(orderId);
+    request.requestBody({});
+
+    const response = await client.execute(request);
+    res.status(200).json({ message: 'Paiement capturé avec succès', response: response.result });
+  } catch (error) {
+    console.error('Erreur lors de la capture du paiement PayPal :', error);
+    res.status(500).json({ error: 'Erreur lors de la capture du paiement PayPal.' });
+  }
+};
