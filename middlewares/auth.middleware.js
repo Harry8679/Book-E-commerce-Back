@@ -1,5 +1,6 @@
 const { expressjwt } = require('express-jwt');
 const User = require('../models/user.model');
+const Order = require('../models/order.model'); // Assurez-vous d'importer le modèle Order
 
 // Middleware pour vérifier si l'utilisateur est connecté
 exports.requireSignin = expressjwt({
@@ -48,53 +49,45 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-exports.isAuth = (req, res, next) => {
-  const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
-  const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
-  const userIdFromProfile = req.profile && req.profile._id?.toString(); // ID de l'utilisateur ciblé
+exports.isAuth = async (req, res, next) => {
+  try {
+    const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
+    const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
+    const { orderId } = req.params; // Récupérer l'ID de la commande depuis les paramètres
 
-  console.log('Auth req.auth', req.auth);
+    console.log('Auth req.auth', req.auth);
 
-  // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
-  if (req.originalUrl.includes('/orders/create')) {
-    return next(); // Autoriser toutes les créations de commandes
-  }
+    // Vérifier si la requête concerne une commande spécifique
+    if (req.originalUrl.includes('/orders') && orderId) {
+      // Rechercher la commande par son ID
+      const order = await Order.findById(orderId);
 
-  // ✅ Autoriser si : c'est le même utilisateur OU si c'est un admin
-  // if (req.originalUrl.includes('/orders') && req.method === 'PUT') {
-  //   // Permettre à l'utilisateur de modifier sa propre commande
-  //   if (req.params.orderId) {
-  //     return Order.findById(req.params.orderId)
-  //       .then((order) => {
-  //         if (!order) {
-  //           return res.status(404).json({ error: 'Order not found' });
-  //         }
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
 
-  //         if (order.user.toString() === userIdFromAuth || userRole === 1) {
-  //           return next();
-  //         }
+      // Vérifier que l'utilisateur connecté est soit le propriétaire de la commande, soit un administrateur
+      if (order.user.toString() === userIdFromAuth || userRole === 1) {
+        return next(); // Autoriser l'accès
+      } else {
+        return res.status(403).json({
+          error: 'Access denied. User is not authorized to modify this order.',
+        });
+      }
+    }
 
-  //         return res.status(403).json({ error: 'Access denied. User is not authorized to modify this order.' });
-  //       })
-  //       .catch((err) => {
-  //         return res.status(500).json({ error: 'Error checking order ownership.' });
-  //       });
-  //   }
-  // }
+    // Autoriser si l'utilisateur accède à une ressource générale
+    if (userIdFromAuth || userRole === 1) {
+      return next();
+    }
 
-  if (!req.auth || (userIdFromAuth !== userIdFromProfile && req.auth.role !== 1)) {
     return res.status(403).json({
       error: 'Access denied. User is not authorized to access this resource.',
     });
+  } catch (err) {
+    console.error('Error in isAuth middleware:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
   }
-
-  if (userIdFromAuth === userIdFromProfile || userRole === 1) {
-    return next();
-  }
-
-  return res.status(403).json({
-    error: 'Access denied. User is not authorized to access this resource.',
-  });
 };
 
 // exports.isAuth = (req, res, next) => {
