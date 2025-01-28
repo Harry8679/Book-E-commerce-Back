@@ -57,13 +57,25 @@ exports.updateOrderPayment = async (req, res) => {
 // Obtenir les commandes d'un utilisateur connecté
 exports.getUserOrders = async (req, res) => {
   try {
+    console.log("User ID:", req.auth._id);
     const orders = await Order.find({ user: req.auth._id }).populate('products.product', 'name price');
+    console.log("Orders found:", orders);
     return res.status(200).json({ orders });
   } catch (error) {
-    console.error('Error fetching user orders:', error);
-    return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
+    console.error('Erreur lors de la récupération des commandes de l\'utilisateur :', error);
+    return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+
+// exports.getUserOrders = async (req, res) => {
+//   try {
+//     const orders = await Order.find({ user: req.auth._id }).populate('products.product', 'name price');
+//     return res.status(200).json({ orders });
+//   } catch (error) {
+//     console.error('Error fetching user orders:', error);
+//     return res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
+//   }
+// };
 
 // Créer un PaymentIntent Stripe
 exports.paymentStripe = async (req, res) => {
