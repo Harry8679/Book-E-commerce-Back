@@ -28,9 +28,11 @@ router.post('/create-paypal-order', createPaypalOrder);
 // router.post('/capture-paypal-order', requireSignin, capturePaypalOrder);
 router.post('/capture-paypal-order', capturePaypalOrder);
 
-
 // Obtenir une commande par son ID
 router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
+
+router.get('/user-orders', requireSignin, isAuth, getUserOrders);
+
 
 // Obtenir les commandes de l'utilisateur connecté
 // router.get('/my-orders', requireSignin, isAuth, getUserOrders);
