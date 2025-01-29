@@ -15,6 +15,8 @@ router.put('/:orderId/pay', requireSignin, isAuth, updateOrderPayment);
 // Obtenir toutes les commandes d'un utilisateur
 router.get('/my-orders', requireSignin, isAuth, getUserOrders);
 
+router.get('/user-orders', requireSignin, isAuth, getUserOrders);
+
 // Route pour obtenir la dernière commande d'un utilisateur connecté
 router.get('/last-order', requireSignin, isAuth, getLastOrder);
 
@@ -30,8 +32,6 @@ router.post('/capture-paypal-order', capturePaypalOrder);
 
 // Obtenir une commande par son ID
 router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
-
-router.get('/user-orders', requireSignin, isAuth, getUserOrders);
 
 
 // Obtenir les commandes de l'utilisateur connecté

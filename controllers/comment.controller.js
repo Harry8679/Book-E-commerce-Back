@@ -16,7 +16,9 @@ exports.createComment = async (req, res) => {
       'products.product': productId,
       isPaid: true,
     });
-
+    
+    console.log("📌 Vérification de la commande :", orderExists);
+    
     if (!orderExists) {
       return res.status(403).json({
         message: "Vous ne pouvez commenter que les produits que vous avez achetés.",

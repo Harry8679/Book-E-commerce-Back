@@ -17,6 +17,8 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: 'No products in the order' });
     }
 
+    console.log(`📌 Création d'une commande pour l'utilisateur ${req.auth._id}`);
+
     const order = new Order({
       user: req.auth._id,
       products,
@@ -27,10 +29,31 @@ exports.createOrder = async (req, res) => {
     const savedOrder = await order.save();
     return res.status(201).json({ message: 'Order created successfully', order: savedOrder });
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error('❌ Error creating order:', error);
     return res.status(500).json({ message: 'Failed to create order', error: error.message });
   }
 };
+
+// Obtenir les commandes d'un utilisateur connecté
+exports.getUserOrders = async (req, res) => {
+  try {
+    console.log("📌 Récupération des commandes de l'utilisateur:", req.auth._id);
+
+    if (!req.auth || !req.auth._id) {
+      return res.status(401).json({ message: "Utilisateur non authentifié." });
+    }
+
+    const orders = await Order.find({ user: req.auth._id })
+      .populate('products.product', 'name price');
+
+    console.log("📌 Commandes trouvées :", orders.length);
+    return res.status(200).json({ orders });
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des commandes:', error);
+    return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+  }
+};
+
 
 // Mettre à jour le paiement d'une commande
 exports.updateOrderPayment = async (req, res) => {
@@ -55,17 +78,17 @@ exports.updateOrderPayment = async (req, res) => {
 };
 
 // Obtenir les commandes d'un utilisateur connecté
-exports.getUserOrders = async (req, res) => {
-  try {
-    console.log("User ID:", req.auth._id);
-    const orders = await Order.find({ user: req.auth._id }).populate('products.product', 'name price');
-    console.log("Orders found:", orders);
-    return res.status(200).json({ orders });
-  } catch (error) {
-    console.error('Erreur lors de la récupération des commandes de l\'utilisateur :', error);
-    return res.status(500).json({ message: 'Erreur serveur', error: error.message });
-  }
-};
+// exports.getUserOrders = async (req, res) => {
+//   try {
+//     console.log("User ID:", req.auth._id);
+//     const orders = await Order.find({ user: req.auth._id }).populate('products.product', 'name price');
+//     console.log("Orders found:", orders);
+//     return res.status(200).json({ orders });
+//   } catch (error) {
+//     console.error('Erreur lors de la récupération des commandes de l\'utilisateur :', error);
+//     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+//   }
+// };
 
 // exports.getUserOrders = async (req, res) => {
 //   try {
