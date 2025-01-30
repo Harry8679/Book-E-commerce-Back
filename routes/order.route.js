@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/create', requireSignin, isAuth, createOrder);
 
 // Obtenir toutes les commandes (réservé aux administrateurs)
-router.get('/all-orders', requireSignin, isAuth, isAdmin, getAllOrders);
+router.get('/all-orders', requireSignin, isAdmin, getAllOrders);
 
 // Mettre à jour le paiement d'une commande
 router.put('/:orderId/pay', requireSignin, isAuth, updateOrderPayment);
