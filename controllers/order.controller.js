@@ -148,7 +148,7 @@ exports.getOrderById = async (req, res) => {
     }
 
     // Vérification que l'utilisateur connecté est celui qui a passé la commande
-    if (order.user.toString() !== userIdFromAuth.toString()) {
+    if (order.user._id.toString() !== userIdFromAuth.toString()) {
       return res.status(403).json({
         message: 'Access denied. This order does not belong to you.',
       });
@@ -160,6 +160,7 @@ exports.getOrderById = async (req, res) => {
     return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
   }
 };
+
 
 exports.getOrderByIdForAdmin = async (req, res) => {
   try {
