@@ -16,7 +16,7 @@ exports.createComment = async (req, res) => {
       'products.product': productId,
       isPaid: true,
     });
-    
+      
     console.log("📌 Vérification de la commande :", orderExists);
     
     if (!orderExists) {
