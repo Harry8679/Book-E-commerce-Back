@@ -33,7 +33,7 @@ router.post('/capture-paypal-order', capturePaypalOrder);
 
 // Obtenir une commande par son ID
 router.get('/:orderId/admin', requireSignin, getOrderByIdForAdmin);
-router.get('/:orderId', requireSignin, getOrderById);
+router.get('/:orderId', requireSignin, isAuth, getOrderById);
 // router.get('/:orderId', requireSignin, isAuth, isAdmin, getOrderById);
 
 
