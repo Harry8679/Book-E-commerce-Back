@@ -10,13 +10,17 @@ exports.createComment = async (req, res) => {
     const { productId, text, rating } = req.body;
     const userId = req.auth._id;
 
+    if (!text || !rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Commentaire ou note invalides." });
+    }
+
     // Vérifier si l'utilisateur a commandé ce produit
     const orderExists = await Order.findOne({
       user: userId,
       'products.product': productId,
       isPaid: true,
-    });
-      
+    }).populate('products.product'); // Cela permet de récupérer les infos sur le produit commandé
+    
     console.log("📌 Vérification de la commande :", orderExists);
     
     if (!orderExists) {
@@ -50,6 +54,51 @@ exports.createComment = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+// exports.createComment = async (req, res) => {
+//   try {
+//     const { productId, text, rating } = req.body;
+//     const userId = req.auth._id;
+
+//     // Vérifier si l'utilisateur a commandé ce produit
+//     const orderExists = await Order.findOne({
+//       user: userId,
+//       'products.product': productId,
+//       isPaid: true,
+//     });
+
+//     console.log("📌 Vérification de la commande :", orderExists);
+    
+//     if (!orderExists) {
+//       return res.status(403).json({
+//         message: "Vous ne pouvez commenter que les produits que vous avez achetés.",
+//       });
+//     }
+
+//     // Créer un nouveau commentaire
+//     const comment = new Comment({
+//       user: userId,
+//       product: productId,
+//       text,
+//       rating,
+//     });
+
+//     // Sauvegarder le commentaire
+//     const savedComment = await comment.save();
+
+//     // Ajouter le commentaire au produit
+//     await Product.findByIdAndUpdate(productId, {
+//       $push: { comments: savedComment._id },
+//     });
+
+//     return res.status(201).json({
+//       message: 'Commentaire ajouté avec succès',
+//       comment: savedComment,
+//     });
+//   } catch (error) {
+//     console.error('Erreur lors de l\'ajout du commentaire :', error);
+//     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+//   }
+// };
 
 /**
  * Récupérer tous les commentaires d'un produit donné
