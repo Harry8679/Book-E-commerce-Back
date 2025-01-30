@@ -42,12 +42,13 @@ exports.isAdmin = (req, res, next) => {
 };
 
 // Middleware pour vérifier si l'utilisateur est authentifié avant d'effectuer une action
+// Middleware pour vérifier si l'utilisateur est authentifié avant d'effectuer une action
 exports.isAuth = async (req, res, next) => {
   try {
     const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
     const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
 
-    // Vérification si l'utilisateur est autorisé à modifier une commande spécifique
+    // Vérification si l'utilisateur est autorisé à voir une commande spécifique
     if (req.originalUrl.includes('/orders')) {
       const { orderId } = req.params; // Récupérer l'ID de la commande depuis les paramètres
       const order = await Order.findById(orderId);
@@ -57,7 +58,7 @@ exports.isAuth = async (req, res, next) => {
       }
 
       // Vérifier si l'utilisateur connecté est soit le propriétaire de la commande, soit un administrateur
-      if (order.user.toString() === userIdFromAuth || userRole === 1) {
+      if (order.user.toString() === userIdFromAuth.toString() || userRole === 1) {
         return next(); // Autoriser l'accès
       } else {
         return res.status(403).json({
@@ -79,6 +80,44 @@ exports.isAuth = async (req, res, next) => {
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };
+
+// exports.isAuth = async (req, res, next) => {
+//   try {
+//     const userIdFromAuth = req.auth && req.auth._id; // ID de l'utilisateur connecté
+//     const userRole = req.auth && req.auth.role; // Rôle de l'utilisateur connecté
+
+//     // Vérification si l'utilisateur est autorisé à modifier une commande spécifique
+//     if (req.originalUrl.includes('/orders')) {
+//       const { orderId } = req.params; // Récupérer l'ID de la commande depuis les paramètres
+//       const order = await Order.findById(orderId);
+
+//       if (!order) {
+//         return res.status(404).json({ error: 'Order not found' });
+//       }
+
+//       // Vérifier si l'utilisateur connecté est soit le propriétaire de la commande, soit un administrateur
+//       if (order.user.toString() === userIdFromAuth || userRole === 1) {
+//         return next(); // Autoriser l'accès
+//       } else {
+//         return res.status(403).json({
+//           error: 'Access denied. User is not authorized to modify this order.',
+//         });
+//       }
+//     }
+
+//     // Autoriser l'accès à toute autre ressource si l'utilisateur est authentifié ou si c'est un administrateur
+//     if (userIdFromAuth || userRole === 1) {
+//       return next();
+//     }
+
+//     return res.status(403).json({
+//       error: 'Access denied. User is not authorized to access this resource.',
+//     });
+//   } catch (err) {
+//     console.error('Error in isAuth middleware:', err);
+//     return res.status(500).json({ error: 'Internal server error.' });
+//   }
+// };
 
 // Middleware pour vérifier l'autorisation d'accès pour les routes publiques ou administratives
 exports.isPublicOrAdmin = async (req, res, next) => {
