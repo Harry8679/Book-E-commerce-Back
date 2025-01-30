@@ -148,7 +148,7 @@ exports.getOrderById = async (req, res) => {
     }
 
     // Vérification que l'utilisateur connecté est celui qui a passé la commande
-    if (order.user._id.toString() !== userIdFromAuth.toString()) {
+    if (!order.user || order.user._id.toString() !== userIdFromAuth.toString()) {
       return res.status(403).json({
         message: 'Access denied. This order does not belong to you.',
       });
