@@ -13,9 +13,10 @@ router.get('/all-orders', requireSignin, isAuth, isAdmin, getAllOrders);
 router.put('/:orderId/pay', requireSignin, isAuth, updateOrderPayment);
 
 // Obtenir toutes les commandes d'un utilisateur
-router.get('/my-orders', requireSignin, isAuth, getUserOrders);
+router.get('/my-orders', requireSignin, getUserOrders);
+// router.get('/my-orders', requireSignin, isAuth, getUserOrders);
 
-router.get('/user-orders', requireSignin, isAuth, getUserOrders);
+router.get('/user-orders', requireSignin, getUserOrders);
 
 // Route pour obtenir la dernière commande d'un utilisateur connecté
 router.get('/last-order', requireSignin, isAuth, getLastOrder);
