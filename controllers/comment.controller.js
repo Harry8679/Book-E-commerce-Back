@@ -8,21 +8,15 @@ const Product = require('../models/product.model');
 exports.createComment = async (req, res) => {
   try {
     const { productId, text, rating } = req.body;
-    const userId = req.auth._id;
-
-    if (!text || !rating || rating < 1 || rating > 5) {
-      return res.status(400).json({ message: "Commentaire ou note invalides." });
-    }
+    const userId = req.auth._id; // L'ID de l'utilisateur connecté
 
     // Vérifier si l'utilisateur a commandé ce produit
     const orderExists = await Order.findOne({
       user: userId,
       'products.product': productId,
       isPaid: true,
-    }).populate('products.product'); // Cela permet de récupérer les infos sur le produit commandé
-    
-    console.log("📌 Vérification de la commande :", orderExists);
-    
+    });
+
     if (!orderExists) {
       return res.status(403).json({
         message: "Vous ne pouvez commenter que les produits que vous avez achetés.",
@@ -54,6 +48,7 @@ exports.createComment = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+
 // exports.createComment = async (req, res) => {
 //   try {
 //     const { productId, text, rating } = req.body;
