@@ -5,7 +5,7 @@ const { createComment, getCommentsByProduct } = require('../controllers/comment.
 const router = express.Router();
 
 // Ajouter un commentaire (seulement si l'utilisateur a acheté le produit)
-router.post('/product/:productId/comment', requireSignin, isAuth, createComment);
+router.post('/product/:productId/comment', requireSignin, createComment);
 
 // Obtenir tous les commentaires d'un produit
 router.get('/product/:productId/comments', getCommentsByProduct);
