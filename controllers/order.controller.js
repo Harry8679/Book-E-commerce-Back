@@ -133,33 +133,33 @@ exports.paymentStripe = async (req, res) => {
 };
 
 // Obtenir une commande par son ID
-// exports.getOrderById = async (req, res) => {
-//   try {
-//     const { orderId } = req.params;
-//     const userIdFromAuth = req.auth._id; // L'ID de l'utilisateur connecté
+exports.getOrderById = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userIdFromAuth = req.auth._id; // L'ID de l'utilisateur connecté
 
-//     // Recherche de la commande par son ID
-//     const order = await Order.findById(orderId)
-//       .populate('user', 'name email') // Récupérer les informations de l'utilisateur
-//       .populate('products.product', 'name price'); // Récupérer les informations des produits
+    // Recherche de la commande par son ID
+    const order = await Order.findById(orderId)
+      .populate('user', 'name email') // Récupérer les informations de l'utilisateur
+      .populate('products.product', 'name price'); // Récupérer les informations des produits
 
-//     if (!order) {
-//       return res.status(404).json({ message: 'Order not found' });
-//     }
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-//     // Vérification que l'utilisateur connecté est celui qui a passé la commande
-//     if (order.user.toString() !== userIdFromAuth.toString()) {
-//       return res.status(403).json({
-//         message: 'Access denied. This order does not belong to you.',
-//       });
-//     }
+    // Vérification que l'utilisateur connecté est celui qui a passé la commande
+    if (order.user.toString() !== userIdFromAuth.toString()) {
+      return res.status(403).json({
+        message: 'Access denied. This order does not belong to you.',
+      });
+    }
 
-//     return res.status(200).json({ order });
-//   } catch (error) {
-//     console.error('Error fetching order by ID:', error);
-//     return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
-//   }
-// };
+    return res.status(200).json({ order });
+  } catch (error) {
+    console.error('Error fetching order by ID:', error);
+    return res.status(500).json({ message: 'Failed to fetch order', error: error.message });
+  }
+};
 
 exports.getOrderByIdForAdmin = async (req, res) => {
   try {
