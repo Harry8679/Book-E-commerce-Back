@@ -109,7 +109,7 @@ exports.getCommentsByProduct = async (req, res) => {
     const { productId } = req.params;
 
     const comments = await Comment.find({ product: productId })
-      .populate('user', 'name') // Récupérer le nom de l'utilisateur
+      .populate('user', 'name') // Inclut le nom de l'utilisateur dans le commentaire
       .sort({ createdAt: -1 });
 
     return res.status(200).json({ comments });
@@ -118,3 +118,17 @@ exports.getCommentsByProduct = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+// exports.getCommentsByProduct = async (req, res) => {
+//   try {
+//     const { productId } = req.params;
+
+//     const comments = await Comment.find({ product: productId })
+//       .populate('user', 'name') // Récupérer le nom de l'utilisateur
+//       .sort({ createdAt: -1 });
+
+//     return res.status(200).json({ comments });
+//   } catch (error) {
+//     console.error('Erreur lors de la récupération des commentaires :', error);
+//     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+//   }
+// };
