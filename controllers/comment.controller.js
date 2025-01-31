@@ -104,12 +104,14 @@ exports.createComment = async (req, res) => {
 /**
  * Récupérer tous les commentaires d'un produit donné
  */
+// Dans le backend
 exports.getCommentsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
+    // Peupler le champ 'user' pour obtenir le nom
     const comments = await Comment.find({ product: productId })
-      .populate('user', 'name') // Inclut le nom de l'utilisateur dans le commentaire
+      .populate('user', 'name')  // Assurez-vous que le champ 'user' contient bien le nom
       .sort({ createdAt: -1 });
 
     return res.status(200).json({ comments });
@@ -118,6 +120,21 @@ exports.getCommentsByProduct = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+
+// exports.getCommentsByProduct = async (req, res) => {
+//   try {
+//     const { productId } = req.params;
+
+//     const comments = await Comment.find({ product: productId })
+//       .populate('user', 'name') // Inclut le nom de l'utilisateur dans le commentaire
+//       .sort({ createdAt: -1 });
+
+//     return res.status(200).json({ comments });
+//   } catch (error) {
+//     console.error('Erreur lors de la récupération des commentaires :', error);
+//     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
+//   }
+// };
 // exports.getCommentsByProduct = async (req, res) => {
 //   try {
 //     const { productId } = req.params;
