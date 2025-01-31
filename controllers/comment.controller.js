@@ -7,8 +7,10 @@ const Product = require('../models/product.model');
  */
 exports.createComment = async (req, res) => {
   try {
-    const { productId, text, rating } = req.body;
-    const userId = req.auth._id; // L'ID de l'utilisateur connecté
+    const { text, rating } = req.body;
+    const productId = req.params.productId; // Récupération de productId depuis les paramètres
+
+    const userId = req.auth._id;
 
     // Vérifier si l'utilisateur a commandé ce produit
     const orderExists = await Order.findOne({
@@ -51,6 +53,7 @@ exports.createComment = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+
 
 // exports.createComment = async (req, res) => {
 //   try {
